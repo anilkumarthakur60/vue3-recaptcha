@@ -68,7 +68,7 @@
     "eslint-plugin-cypress": "^5.1.0",
     "eslint-plugin-vue": "^10.2.0",
     "jest": "^30.0.0",
-    "jest-environment-jsdom": "^30.0.0",
+    "jest-environment-jsdom": "^30.0.5",
     "jsdom": "^26.1.0",
     "npm-run-all2": "^8.0.4",
     "prettier": "^3.6.0",
