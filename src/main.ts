@@ -11,9 +11,7 @@ app.use(createPinia())
 app.use(router)
 app.use(recaptchaPlugin, {
   siteKey: '6Ld22VYrAAAAACjAgqRWwYzzJhZNmL4FzWYpak1b',
-  action: 'login',
-  
+  action: 'login'
 })
 
 app.mount('#app')
- 

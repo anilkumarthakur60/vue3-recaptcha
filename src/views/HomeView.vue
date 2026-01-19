@@ -1,4 +1,3 @@
-
 <script setup lang="ts">
 import { RecaptchaV3 } from '../package/components'
 import { onMounted, ref, nextTick } from 'vue'
@@ -80,7 +79,6 @@ onMounted(async () => {
   await handleRegenerate()
 })
 </script>
-
 
 <template>
   <div class="recaptcha-container">
