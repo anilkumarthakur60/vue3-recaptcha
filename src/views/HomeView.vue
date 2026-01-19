@@ -1,22 +1,16 @@
+
 <script setup lang="ts">
 import { RecaptchaV3 } from '../package/components'
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, nextTick } from 'vue'
 import axios from 'axios'
 
 const recaptchaComponent = ref<InstanceType<typeof RecaptchaV3> | null>(null)
-const loading = ref<boolean>(false)
-const recaptchaToken = ref<string>('')
-
-const handleTokenUpdate = (token: string) => {
-  copyToken('Token has been regenerated and copied to clipboard')
-  console.log('Token updated:', token)
-}
+const loading = ref(false)
+const recaptchaToken = ref('')
 
 const showMessage = (message: string, duration: number = 1000) => {
   const existingMessageDiv = document.querySelector('.custom-message-div')
-  if (existingMessageDiv) {
-    document.body.removeChild(existingMessageDiv)
-  }
+  if (existingMessageDiv) document.body.removeChild(existingMessageDiv)
 
   const messageDiv = document.createElement('div')
   messageDiv.className = 'custom-message-div'
@@ -31,12 +25,13 @@ const showMessage = (message: string, duration: number = 1000) => {
   messageDiv.style.borderRadius = '5px'
   messageDiv.style.boxShadow = '0 2px 4px rgba(0, 0, 0, 0.2)'
   document.body.appendChild(messageDiv)
+
   setTimeout(() => {
-    document.body.removeChild(messageDiv)
+    if (document.body.contains(messageDiv)) document.body.removeChild(messageDiv)
   }, duration)
 }
 
-const copyToken = async (message: string = 'Token has been copied to clipboard') => {
+const copyToken = async (message = 'Token has been copied to clipboard') => {
   try {
     await navigator.clipboard.writeText(recaptchaToken.value)
     showMessage(message)
@@ -47,8 +42,20 @@ const copyToken = async (message: string = 'Token has been copied to clipboard')
 
 const handleRegenerate = async () => {
   loading.value = true
-  await recaptchaComponent.value?.loadRecaptcha()
-  loading.value = false
+  try {
+    await nextTick() // ✅ ensure template refs exist
+    const token = await recaptchaComponent.value?.loadRecaptcha()
+    if (token) recaptchaToken.value = token
+  } catch (error) {
+    console.error('Failed to regenerate token:', error)
+    showMessage('Failed to regenerate token', 2000)
+  } finally {
+    loading.value = false
+  }
+}
+
+const handleTokenUpdate = () => {
+  copyToken('Token has been regenerated and copied to clipboard')
 }
 
 const verifyResponse = ref<any>(null)
@@ -58,9 +65,7 @@ const verifyRecaptcha = async () => {
   try {
     const response = await axios.post(
       'https://express-recaptcha-verify.vercel.app/verify-captcha',
-      {
-        captcha_token: recaptchaToken.value
-      }
+      { captcha_token: recaptchaToken.value }
     )
     verifyResponse.value = response.data
   } catch (error) {
@@ -70,8 +75,12 @@ const verifyRecaptcha = async () => {
   }
 }
 
-onMounted(handleRegenerate)
+onMounted(async () => {
+  // ✅ generate token on mount
+  await handleRegenerate()
+})
 </script>
+
 
 <template>
   <div class="recaptcha-container">

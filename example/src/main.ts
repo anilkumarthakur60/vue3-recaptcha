@@ -5,7 +5,7 @@ import { recaptchaPlugin, } from '@anilkumarthakur/vue3-recaptcha'
 const app = createApp(App)
 
 app.use(recaptchaPlugin,{
-    siteKey: '6LfQNKUaAAAAAHSVAVcs7kuzv2ZjLcR5nxssKrg5',
+    siteKey: '6Ld22VYrAAAAACjAgqRWwYzzJhZNmL4FzWYpak1b',
     siteAction:'login',
 })
 
