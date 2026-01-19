@@ -68,7 +68,4 @@ docs/
 *.md
 !README.md
 
-# Package manager lock files (optional)
-package-lock.json
-yarn.lock
-pnpm-lock.yaml
+

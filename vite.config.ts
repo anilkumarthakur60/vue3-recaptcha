@@ -41,7 +41,8 @@ export default defineConfig({
         {
           format: 'es',
           entryFileNames: 'index.es.js',
-          dir: 'dist'
+          dir: 'dist',
+          exports: 'named'
         },
         {
           format: 'umd',
@@ -50,26 +51,26 @@ export default defineConfig({
           globals: {
             vue: 'Vue'
           },
-          dir: 'dist'
+          dir: 'dist',
+          exports: 'named'
         },
         {
           format: 'cjs',
           entryFileNames: 'index.cjs',
-          dir: 'dist'
+          dir: 'dist',
+          exports: 'named'
         }
       ]
     },
 
     // Build optimizations
     minify: 'esbuild', // Use esbuild instead of terser (lighter weight)
-    sourcemap: true,
+    sourcemap: false, // Disable for production npm package (reduces size by ~150 KB)
     emptyOutDir: true,
     cssCodeSplit: false,
     target: 'ES2020',
-
-    // Performance hints
-    reportCompressedSize: true,
-    chunkSizeWarningLimit: 500
+    outDir: 'dist',
+    copyPublicDir: false, // Prevent favicon.ico from being copied to dist
   },
 
   resolve: {

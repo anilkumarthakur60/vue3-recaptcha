@@ -1,41 +1,46 @@
 # Vue3 Recaptcha
 
-[![npm version](https://badge.fury.io/js/@anilkumarthakur%2Fvue3-recaptcha.svg)](https://badge.fury.io/js/@anilkumarthakur%2Fvue3-recaptcha)
+[![npm version](https://badge.fury.io/js/@anilkumarthakur%2Fvue3-recaptcha.svg)](https://www.npmjs.com/package/@anilkumarthakur/vue3-recaptcha)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![GitHub](https://img.shields.io/badge/GitHub-anilkumarthakur/vue3--recaptcha-blue)](https://github.com/anilkumarthakur/vue3-recaptcha)
 
-A Vue 3 plugin for seamless Google reCAPTCHA v2 and v3 integration. Supports both checkbox and invisible reCAPTCHA v2, as well as the score-based reCAPTCHA v3.
+A fully-typed Vue 3 plugin for seamless Google reCAPTCHA v2 and v3 integration. Supports reCAPTCHA v2 (checkbox & invisible) and v3 (score-based) with TypeScript first approach.
 
-## Features
+> **Note:** This package requires Vue 3.4.0 or higher
 
-✨ **Full reCAPTCHA Support**
+## ✨ Features
 
-- reCAPTCHA v2 Checkbox
-- reCAPTCHA v2 Invisible
-- reCAPTCHA v3 (Score-based)
+**Full reCAPTCHA Support**
+- ✅ reCAPTCHA v2 Checkbox
+- ✅ reCAPTCHA v2 Invisible  
+- ✅ reCAPTCHA v3 (Score-based)
 
-🎯 **Developer Experience**
+**Developer Experience**
+- 🎯 TypeScript first - Fully typed components and composables
+- 🚀 Vue 3 Composition API compatible
+- 📦 Easy to use with v-model binding
+- ⚙️ Global plugin configuration with component-level overrides
+- 🔒 SSR-safe implementation
 
-- TypeScript first - Fully typed components and composables
-- Vue 3 Composition API compatible
-- Easy to use with v-model binding
-- Global plugin configuration
-- Component-level overrides
+**Advanced Features**
+- 🔄 Automatic script loading with caching
+- ⚡ Error handling and retry logic
+- ⏱️ Token expiration management
+- 📦 Multiple output formats (ES, UMD, CommonJS)
+- 🎨 Full TypeScript support with IntelliSense
 
-⚙️ **Advanced Features**
-
-- Automatic script loading with caching
-- Error handling and retry logic
-- Token expiration management
-- SSR-safe implementation
-- Multiple output formats (ES, UMD, CommonJS)
-
-## Installation
+## 📦 Installation
 
 ```bash
 npm install @anilkumarthakur/vue3-recaptcha
 ```
 
-## Quick Start
+### Requirements
+
+- Vue 3.4.0 or higher
+- Node.js 18.0.0 or higher
+
+## 🚀 Quick Start
 
 ### 1. Register the Plugin
 
@@ -48,7 +53,7 @@ const app = createApp(App)
 
 app.use(VueRecaptchaPlugin, {
   siteKey: 'your-recaptcha-site-key',
-  version: 'v3' // 'v2' or 'v3'
+  version: 'v3' // 'v2' or 'v3' (default: 'v3')
 })
 
 app.mount('#app')
@@ -56,22 +61,26 @@ app.mount('#app')
 
 ### 2. Use in Components
 
-#### reCAPTCHA v3
+#### reCAPTCHA v3 (Recommended)
 
 ```vue
 <template>
-  <button @click="handleSubmit">Submit Form</button>
+  <button @click="handleSubmit" :disabled="isLoading">
+    {{ isLoading ? 'Submitting...' : 'Submit Form' }}
+  </button>
+  <p v-if="error" class="error">{{ error.message }}</p>
 </template>
 
 <script setup lang="ts">
 import { useRecaptchaV3 } from '@anilkumarthakur/vue3-recaptcha'
 
-const { execute, token, error } = useRecaptchaV3({ action: 'submit' })
+const { execute, token, error, isLoading } = useRecaptchaV3({ action: 'submit' })
 
 async function handleSubmit() {
   try {
     const token = await execute()
     // Send token to your backend for verification
+    console.log('Token:', token)
   } catch (err) {
     console.error('reCAPTCHA failed:', err)
   }
@@ -84,8 +93,17 @@ async function handleSubmit() {
 ```vue
 <template>
   <form @submit.prevent="submitForm">
-    <RecaptchaV2Checkbox v-model="captchaToken" />
-    <button type="submit">Submit</button>
+    <div class="form-group">
+      <input v-model="formData" placeholder="Enter your data" />
+    </div>
+    <RecaptchaV2Checkbox 
+      v-model="captchaToken"
+      theme="light"
+      size="normal"
+      @verify="onVerified"
+      @error="onError"
+    />
+    <button type="submit" :disabled="!captchaToken">Submit</button>
   </form>
 </template>
 
@@ -93,6 +111,7 @@ async function handleSubmit() {
 import { ref } from 'vue'
 import { RecaptchaV2Checkbox } from '@anilkumarthakur/vue3-recaptcha'
 
+const formData = ref('')
 const captchaToken = ref('')
 
 function submitForm() {
@@ -100,7 +119,16 @@ function submitForm() {
     alert('Please verify the reCAPTCHA')
     return
   }
-  // Submit form with token
+  // Submit form with token to backend
+  console.log('Token:', captchaToken.value)
+}
+
+function onVerified(token: string) {
+  console.log('Verified with token:', token)
+}
+
+function onError(error: Error) {
+  console.error('Verification error:', error)
 }
 </script>
 ```
@@ -111,7 +139,11 @@ function submitForm() {
 <template>
   <form @submit.prevent="submitForm" ref="formRef">
     <input v-model="formData" placeholder="Enter data" />
-    <RecaptchaV2Invisible ref="captcha" @verify="onVerified" />
+    <RecaptchaV2Invisible 
+      ref="captcha" 
+      @verify="onVerified"
+      badge="bottomright"
+    />
     <button type="submit">Submit</button>
   </form>
 </template>
@@ -128,6 +160,7 @@ async function submitForm() {
   try {
     const token = await captcha.value.execute()
     // Handle successful verification
+    console.log('Verified with token:', token)
   } catch (error) {
     console.error('Verification failed:', error)
   }
@@ -139,26 +172,30 @@ function onVerified(token: string) {
 </script>
 ```
 
-## API Reference
+## 📚 API Reference
 
 ### Plugin Options
 
 ```typescript
 interface RecaptchaPluginOptions {
-  // Your Google reCAPTCHA site key
+  // Your Google reCAPTCHA site key (required)
   siteKey: string
 
   // reCAPTCHA version: 'v2' or 'v3' (default: 'v3')
-  version?: RecaptchaVersion
+  version?: 'v2' | 'v3'
 
   // Auto-load the reCAPTCHA script (default: true)
   autoLoad?: boolean
 
   // Language code (e.g., 'en', 'fr', 'de')
+  // @see https://developers.google.com/recaptcha/docs/language
   language?: string
 
   // Custom script URL for enterprise/self-hosted
   scriptUrl?: string
+
+  // Action name for reCAPTCHA v3 analytics (default: 'submit')
+  action?: string
 
   // Callback when script is loaded
   onLoad?: () => void
@@ -168,39 +205,55 @@ interface RecaptchaPluginOptions {
 }
 ```
 
-### Components
+## 🎮 Components
 
-#### RecaptchaV2Checkbox
+### RecaptchaV2Checkbox
+
+Renders a visible reCAPTCHA v2 checkbox widget.
 
 ```typescript
 interface RecaptchaV2CheckboxProps {
-  siteKey?: string           // Override plugin siteKey
-  theme?: 'light' | 'dark'   // Default: 'light'
-  size?: 'normal' | 'compact' // Default: 'normal'
+  // Override global siteKey
+  siteKey?: string
+  
+  // Widget theme: 'light' | 'dark' (default: 'light')
+  theme?: 'light' | 'dark'
+  
+  // Widget size: 'normal' | 'compact' (default: 'normal')
+  size?: 'normal' | 'compact'
+  
+  // Accessibility tabindex (default: 0)
   tabindex?: number
-  modelValue?: string        // v-model
+  
+  // v-model binding for token
+  modelValue?: string
 }
 
 // Events
-@verify="(token: string) => void"
-@expire="() => void"
-@error="(error: Error) => void"
-@load="() => void"
+@verify="(token: string) => void"      // Fired when verified
+@expire="() => void"                   // Fired when token expires
+@error="(error: Error) => void"        // Fired on error
+@load="() => void"                     // Fired when ready
 @update:modelValue="(token: string) => void"
 
-// Methods
-reset()                      // Reset the widget
-getResponse(): string        // Get current token
+// Methods (via ref)
+reset(): void                          // Reset the widget
+getResponse(): string                  // Get current token
 ```
 
-#### RecaptchaV2Invisible
+### RecaptchaV2Invisible
+
+Renders an invisible reCAPTCHA v2 widget that triggers automatically on form submission.
 
 ```typescript
 interface RecaptchaV2InvisibleProps {
-  siteKey?: string           // Override plugin siteKey
-  badge?: RecaptchaBadgePosition  // 'bottomright' | 'bottomleft' | 'inline'
+  siteKey?: string
+  
+  // Badge position: 'bottomright' | 'bottomleft' | 'inline' (default: 'bottomright')
+  badge?: 'bottomright' | 'bottomleft' | 'inline'
+  
   tabindex?: number
-  modelValue?: string        // v-model
+  modelValue?: string
 }
 
 // Events (same as checkbox)
@@ -209,82 +262,113 @@ interface RecaptchaV2InvisibleProps {
 @error="(error: Error) => void"
 @load="() => void"
 
-// Methods
-execute(): Promise<string>   // Trigger verification
-reset()                      // Reset the widget
-getResponse(): string        // Get current token
+// Methods (via ref)
+execute(): Promise<string>             // Manually trigger verification
+reset(): void                          // Reset the widget
+getResponse(): string                  // Get current token
 ```
 
-#### RecaptchaV3
+### RecaptchaV3
+
+Renders a hidden reCAPTCHA v3 widget. The badge must be visible per Google's terms.
 
 ```typescript
 interface RecaptchaV3Props {
-  siteKey?: string           // Override plugin siteKey
-  action?: string            // Analytics action name (default: 'submit')
-  badge?: RecaptchaBadgePosition
-  hideBadge?: boolean        // Hide the badge
-  modelValue?: string        // v-model
+  siteKey?: string
+  
+  // Action name for analytics (default: 'submit')
+  action?: string
+  
+  // Badge position (default: 'bottomright')
+  badge?: 'bottomright' | 'bottomleft' | 'inline'
+  
+  // Hide the reCAPTCHA badge (not recommended - check Google's ToS)
+  hideBadge?: boolean
+  
+  modelValue?: string
 }
 
 // Events
-@verify="(token: string) => void"
-@error="(error: Error) => void"
-@load="() => void"
+@verify="(token: string) => void"      // When token is obtained
+@error="(error: Error) => void"        // On error
+@load="() => void"                     // When ready
 @update:modelValue="(token: string) => void"
 
-// Methods
-execute(action?: string): Promise<string>  // Get token
-load(): Promise<void>       // Load the script
+// Methods (via ref)
+execute(action?: string): Promise<string>  // Execute and get token
+load(): Promise<void>                  // Load the script
 ```
 
-### Composables
+## 🪝 Composables
 
-#### useRecaptchaV2
+### useRecaptchaV2
+
+For programmatic v2 control with full state management.
 
 ```typescript
 const {
-  token,          // Readonly Ref<string> - Current token
-  isReady,        // Readonly Ref<boolean> - Widget ready state
-  isLoading,      // Readonly Ref<boolean> - Loading state
-  error,          // Readonly Ref<Error | null> - Error if any
-  widgetId,       // Readonly Ref<number | null> - Widget ID
-  render,         // (container: HTMLElement | string) => Promise<number>
-  execute,        // () => Promise<string> - For invisible mode
-  reset,          // () => void
-  getResponse     // () => string
+  token,           // Readonly Ref<string> - Current token
+  isReady,         // Readonly Ref<boolean> - Widget ready state
+  isLoading,       // Readonly Ref<boolean> - Loading state
+  error,           // Readonly Ref<Error | null> - Error object
+  widgetId,        // Readonly Ref<number | null> - Widget ID
+  
+  render,          // (container: HTMLElement | string) => Promise<number>
+  execute,         // () => Promise<string> - For invisible mode
+  reset,           // () => void
+  getResponse      // () => string
 } = useRecaptchaV2({
-  siteKey: 'override-key',
-  theme: 'dark',
-  size: 'compact'
+  siteKey: 'override-key',     // Optional: override plugin key
+  theme: 'dark',               // Optional: 'light' | 'dark'
+  size: 'compact',             // Optional: 'normal' | 'compact'
+  badge: 'bottomright'         // Optional: position
 })
 ```
 
-#### useRecaptchaV3
+### useRecaptchaV3
+
+For programmatic v3 control with automatic token refresh.
 
 ```typescript
 const {
-  token,          // Readonly Ref<string> - Current token
-  isReady,        // Readonly Ref<boolean> - Ready state
-  isLoading,      // Readonly Ref<boolean> - Loading state
-  error,          // Readonly Ref<Error | null> - Error if any
-  execute         // (action?: string) => Promise<string>
+  token,           // Readonly Ref<string> - Current token
+  isReady,         // Readonly Ref<boolean> - Script ready state
+  isLoading,       // Readonly Ref<boolean> - Loading state
+  error,           // Readonly Ref<Error | null> - Error object
+  
+  execute          // (action?: string) => Promise<string>
 } = useRecaptchaV3({
-  siteKey: 'override-key',
-  action: 'login'
+  siteKey: 'override-key',     // Optional: override plugin key
+  action: 'login'              // Optional: action name
 })
 ```
 
-## Examples
+## 💡 Usage Examples
 
-### Form Validation with v3
+### Complete Form with v3 reCAPTCHA
 
 ```vue
 <template>
-  <form @submit.prevent="submitForm">
-    <input v-model="email" type="email" placeholder="Enter email" />
-    <button :disabled="isSubmitting">
-      {{ isSubmitting ? 'Submitting...' : 'Submit' }}
+  <form @submit.prevent="handleSubmit" class="contact-form">
+    <div>
+      <label for="email">Email:</label>
+      <input id="email" v-model="email" type="email" required />
+    </div>
+    
+    <div>
+      <label for="message">Message:</label>
+      <textarea id="message" v-model="message" required></textarea>
+    </div>
+    
+    <button 
+      type="submit" 
+      :disabled="isSubmitting"
+    >
+      {{ isSubmitting ? 'Sending...' : 'Send Message' }}
     </button>
+    
+    <p v-if="error" class="error">{{ error }}</p>
+    <p v-if="success" class="success">Message sent successfully!</p>
   </form>
 </template>
 
@@ -293,89 +377,237 @@ import { ref } from 'vue'
 import { useRecaptchaV3 } from '@anilkumarthakur/vue3-recaptcha'
 
 const email = ref('')
+const message = ref('')
 const isSubmitting = ref(false)
-const { execute } = useRecaptchaV3({ action: 'submit_form' })
+const error = ref('')
+const success = ref(false)
 
-async function submitForm() {
+const { execute } = useRecaptchaV3({ action: 'contact_form' })
+
+async function handleSubmit() {
   isSubmitting.value = true
+  error.value = ''
+  success.value = false
+  
   try {
     const token = await execute()
-    // Verify with backend
-    const response = await fetch('/api/verify', {
+    
+    const response = await fetch('/api/contact', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ token, email: email.value })
+      body: JSON.stringify({
+        email: email.value,
+        message: message.value,
+        recaptchaToken: token
+      })
     })
-    // Handle response
-  } catch (error) {
-    console.error('Submission failed:', error)
+    
+    if (response.ok) {
+      success.value = true
+      email.value = ''
+      message.value = ''
+    } else {
+      error.value = 'Failed to send message'
+    }
+  } catch (err) {
+    error.value = err instanceof Error ? err.message : 'An error occurred'
   } finally {
     isSubmitting.value = false
   }
 }
 </script>
+
+<style scoped>
+.contact-form {
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.error {
+  color: #d32f2f;
+  margin-top: 1rem;
+}
+
+.success {
+  color: #388e3c;
+  margin-top: 1rem;
+}
+</style>
 ```
 
 ### Multiple Actions with v3
 
 ```typescript
+import { useRecaptchaV3 } from '@anilkumarthakur/vue3-recaptcha'
+
 const { execute } = useRecaptchaV3()
 
-// Different actions for different user interactions
-await execute('login')
-await execute('signup')
-await execute('checkout')
+// Different actions for different interactions
+async function handleLogin() {
+  const token = await execute('login')
+  // Send to backend
+}
+
+async function handleSignup() {
+  const token = await execute('signup')
+  // Send to backend
+}
+
+async function handleCheckout() {
+  const token = await execute('checkout')
+  // Send to backend
+}
 ```
 
-## Browser Support
+### Dynamic Site Key Override
 
-- Chrome/Edge: Latest 2 versions
-- Firefox: Latest 2 versions
-- Safari: Latest 2 versions
-- Node.js: 18.0.0 or higher
+```vue
+<template>
+  <RecaptchaV3 
+    :siteKey="selectedKey"
+    action="custom_action"
+  />
+</template>
 
-## TypeScript Support
+<script setup lang="ts">
+import { computed } from 'vue'
+import { RecaptchaV3 } from '@anilkumarthakur/vue3-recaptcha'
 
-Full TypeScript support included. All components and composables are fully typed.
+const environment = 'production' // or 'staging'
+
+const selectedKey = computed(() => {
+  return environment === 'production'
+    ? 'prod-site-key'
+    : 'staging-site-key'
+})
+</script>
+```
+
+## 🔐 Backend Verification
+
+After receiving a token from your frontend, verify it on your backend:
+
+### Node.js/Express Example
+
+```typescript
+import axios from 'axios'
+
+app.post('/api/verify-recaptcha', async (req, res) => {
+  const { token } = req.body
+  const secretKey = process.env.RECAPTCHA_SECRET_KEY
+
+  try {
+    const response = await axios.post(
+      `https://www.google.com/recaptcha/api/siteverify`,
+      null,
+      {
+        params: {
+          secret: secretKey,
+          response: token
+        }
+      }
+    )
+
+    if (response.data.success) {
+      const score = response.data.score // v3 only: 0.0 to 1.0
+      if (score > 0.5) {
+        // Proceed with action
+        res.json({ verified: true })
+      } else {
+        res.status(403).json({ verified: false, reason: 'Low score' })
+      }
+    } else {
+      res.status(403).json({ verified: false, reason: 'Invalid token' })
+    }
+  } catch (error) {
+    res.status(500).json({ error: 'Verification failed' })
+  }
+})
+```
+
+## 📱 Browser Support
+
+| Browser | Versions |
+|---------|----------|
+| Chrome/Edge | Latest 2 versions |
+| Firefox | Latest 2 versions |
+| Safari | Latest 2 versions |
+| Mobile | Modern versions |
+
+## ✅ TypeScript Support
+
+Full TypeScript support with comprehensive type definitions:
 
 ```typescript
 import type {
   RecaptchaPluginOptions,
   RecaptchaV2CheckboxProps,
+  RecaptchaV2InvisibleProps,
   RecaptchaV3Props,
   UseRecaptchaV2Options,
-  UseRecaptchaV3Options
+  UseRecaptchaV2Return,
+  UseRecaptchaV3Options,
+  UseRecaptchaV3Return,
+  RecaptchaContext
 } from '@anilkumarthakur/vue3-recaptcha'
 ```
 
-## Contributing
+## 🆘 Troubleshooting
 
-Contributions are welcome! Please open an issue or submit a pull request.
+### "reCAPTCHA is not defined"
 
-## License
+Make sure the reCAPTCHA script is loaded before using the plugin:
 
-MIT License - see LICENSE file for details
+```typescript
+app.use(VueRecaptchaPlugin, {
+  siteKey: 'your-site-key',
+  autoLoad: true  // Ensure this is true (default)
+})
+```
 
-## Support
+### Token not being updated
 
-- 🐛 [Report Issues](https://github.com/anilkumarthakur/vue3-recaptcha/issues)
-- 💬 [Discussions](https://github.com/anilkumarthakur/vue3-recaptcha/discussions)
-- 📖 [Documentation](https://github.com/anilkumarthakur/vue3-recaptcha)
+Ensure you're using `v-model` correctly on the component or watching the reactive token reference:
 
-## Changelog
+```typescript
+const { token } = useRecaptchaV3()
 
-### v0.1.0
+// Watch for changes
+watch(token, (newToken) => {
+  console.log('New token:', newToken)
+})
+```
 
-- Complete rewrite with v2 and v3 support
-- Added composables for flexible usage
-- Improved TypeScript support
-- Better error handling
-- Multiple output formats
+### CORS Issues
 
-See [CHANGELOG.md](./CHANGELOG.md) for detailed version history.
+If you get CORS errors when verifying tokens on the backend, verify that:
+1. Your backend is properly configured to make requests to Google's servers
+2. You're using the correct secret key from your Google Console
+3. Your backend URL is included in the authorized JavaScript origins in Google Console
 
-## Resources
+## 📖 Documentation
 
-- [Google reCAPTCHA Documentation](https://developers.google.com/recaptcha)
-- [Vue 3 Documentation](https://vuejs.org/)
+- [Google reCAPTCHA Docs](https://developers.google.com/recaptcha)
+- [Vue 3 Guide](https://vuejs.org/guide/introduction.html)
 - [GitHub Repository](https://github.com/anilkumarthakur/vue3-recaptcha)
+
+## 🤝 Contributing
+
+Contributions are welcome! Please feel free to:
+- Report bugs
+- Suggest features
+- Submit pull requests
+
+[Submit an Issue](https://github.com/anilkumarthakur/vue3-recaptcha/issues)
+
+## 📄 License
+
+MIT License - see [LICENSE](./LICENSE) file for details.
+
+## 🙏 Acknowledgments
+
+Built with ❤️ for the Vue 3 community.
+
+---
+
+**Questions?** Open a [GitHub Discussion](https://github.com/anilkumarthakur/vue3-recaptcha/discussions)
