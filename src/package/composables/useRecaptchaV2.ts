@@ -123,7 +123,6 @@ export function useRecaptchaV2(options: UseRecaptchaV2Options = {}): UseRecaptch
           clearInterval(checkToken as any)
           reject(new Error('[vue3-recaptcha] Execute timeout'))
         }, 30000) as any
-
         ;(window.grecaptcha as any).execute(widgetId.value ?? undefined)
       } catch (err) {
         reject(err instanceof Error ? err : new Error(String(err)))
