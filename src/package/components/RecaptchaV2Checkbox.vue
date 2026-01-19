@@ -9,7 +9,7 @@
  */
 
 import { ref, computed, watch, onMounted, onBeforeUnmount, inject } from 'vue'
-import type { RecaptchaV2CheckboxProps, RecaptchaContext, RecaptchaTheme } from '../types'
+import type { RecaptchaV2CheckboxProps, RecaptchaContext } from '../types'
 import { RECAPTCHA_INJECTION_KEY } from '../types'
 import { loadRecaptchaScript, isRecaptchaLoaded } from '../utils/script-loader'
 
@@ -91,9 +91,9 @@ async function renderWidget(): Promise<void> {
       })
     }
 
-    widgetId.value = window.grecaptcha.render(containerRef.value, {
+    widgetId.value = (window.grecaptcha as any).render(containerRef.value, {
       sitekey: siteKey.value,
-      theme: props.theme as RecaptchaTheme,
+      theme: props.theme as any,
       size: props.size,
       tabindex: props.tabindex,
       callback: onVerify,
@@ -113,8 +113,8 @@ async function renderWidget(): Promise<void> {
  * Reset the widget
  */
 function reset(): void {
-  if (widgetId.value !== null && window.grecaptcha) {
-    window.grecaptcha.reset(widgetId.value)
+  if (widgetId.value !== null && window.grecaptcha && 'reset' in window.grecaptcha) {
+    ;(window.grecaptcha as any).reset(widgetId.value)
     emit('update:modelValue', '')
   }
 }
@@ -123,8 +123,8 @@ function reset(): void {
  * Get current response token
  */
 function getResponse(): string {
-  if (widgetId.value !== null && window.grecaptcha) {
-    return window.grecaptcha.getResponse(widgetId.value)
+  if (widgetId.value !== null && window.grecaptcha && 'getResponse' in window.grecaptcha) {
+    return (window.grecaptcha as any).getResponse(widgetId.value)
   }
   return ''
 }

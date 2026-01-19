@@ -146,6 +146,7 @@ onBeforeUnmount(() => {
 // Expose methods for parent components
 defineExpose({
   load,
+  loadRecaptcha: load, // Backward compatibility alias
   execute,
   isLoaded,
   isLoading,

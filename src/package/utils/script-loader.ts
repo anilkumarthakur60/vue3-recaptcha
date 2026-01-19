@@ -66,8 +66,8 @@ export function buildScriptUrl(options: ScriptLoaderOptions): string {
     params.set('render', 'explicit')
     // For v2, we need explicit rendering
     if (typeof window !== 'undefined') {
-      window.___grecaptcha_cfg = window.___grecaptcha_cfg || {}
-      window.___grecaptcha_cfg.explicit = true
+      ;(window as any).___grecaptcha_cfg = (window as any).___grecaptcha_cfg || {}
+      ;(window as any).___grecaptcha_cfg.explicit = true
     }
   }
 
@@ -168,7 +168,7 @@ export function waitForRecaptcha(): Promise<void> {
       if (window.grecaptcha) {
         clearInterval(checkInterval)
         clearTimeout(timeout)
-        
+
         if (window.grecaptcha.ready) {
           window.grecaptcha.ready(() => {
             isLoaded = true

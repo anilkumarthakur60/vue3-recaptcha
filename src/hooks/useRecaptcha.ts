@@ -1,13 +1,5 @@
 import { ref } from 'vue'
-declare global {
-  interface Window {
-    grecaptcha: {
-      ready: (callback: () => void) => void
-      execute: (siteKey: string, options: { action: string }) => Promise<string>
-      reset: () => void
-    }
-  }
-}
+
 export default function useRecaptcha(
   siteKey = '6LfQNKUaAAAAAHSVAVcs7kuzv2ZjLcR5nxssKrg5',
   action = 'homepage'

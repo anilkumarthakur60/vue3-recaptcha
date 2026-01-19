@@ -104,7 +104,7 @@ async function renderWidget(): Promise<void> {
       })
     }
 
-    widgetId.value = window.grecaptcha.render(containerRef.value, {
+    widgetId.value = (window.grecaptcha as any).render(containerRef.value, {
       sitekey: siteKey.value,
       size: 'invisible',
       tabindex: props.tabindex,
@@ -148,7 +148,7 @@ async function execute(): Promise<string> {
     }, 60000)
 
     try {
-      window.grecaptcha.execute(widgetId.value!)
+      ;(window.grecaptcha as any).execute(widgetId.value!)
 
       // Clear timeout when resolved
       const originalResolve = pendingResolve.value
@@ -167,8 +167,8 @@ async function execute(): Promise<string> {
  * Reset the widget
  */
 function reset(): void {
-  if (widgetId.value !== null && window.grecaptcha) {
-    window.grecaptcha.reset(widgetId.value)
+  if (widgetId.value !== null && window.grecaptcha && 'reset' in window.grecaptcha) {
+    ;(window.grecaptcha as any).reset(widgetId.value)
     emit('update:modelValue', '')
     pendingResolve.value = null
     pendingReject.value = null
@@ -179,8 +179,8 @@ function reset(): void {
  * Get current response token
  */
 function getResponse(): string {
-  if (widgetId.value !== null && window.grecaptcha) {
-    return window.grecaptcha.getResponse(widgetId.value)
+  if (widgetId.value !== null && window.grecaptcha && 'getResponse' in window.grecaptcha) {
+    return (window.grecaptcha as any).getResponse(widgetId.value)
   }
   return ''
 }

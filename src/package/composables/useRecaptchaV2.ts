@@ -4,13 +4,7 @@
  */
 
 import { ref, readonly, inject, onUnmounted } from 'vue'
-import type {
-  UseRecaptchaV2Options,
-  UseRecaptchaV2Return,
-  RecaptchaContext,
-  RecaptchaTheme,
-  RecaptchaSize
-} from '../types'
+import type { UseRecaptchaV2Options, UseRecaptchaV2Return, RecaptchaContext } from '../types'
 import { RECAPTCHA_INJECTION_KEY } from '../types'
 import { loadRecaptchaScript, isRecaptchaLoaded } from '../utils/script-loader'
 
@@ -73,10 +67,10 @@ export function useRecaptchaV2(options: UseRecaptchaV2Options = {}): UseRecaptch
 
     return new Promise((resolve, reject) => {
       try {
-        const id = window.grecaptcha.render(container, {
+        const id = (window.grecaptcha as any).render(container, {
           sitekey: siteKey,
-          theme: options.theme as RecaptchaTheme,
-          size: options.size as RecaptchaSize,
+          theme: options.theme as any,
+          size: options.size as any,
           tabindex: options.tabindex,
           callback: (responseToken: string) => {
             token.value = responseToken
@@ -114,20 +108,23 @@ export function useRecaptchaV2(options: UseRecaptchaV2Options = {}): UseRecaptch
       try {
         // Set up a one-time callback to capture the token
         const originalCallback = token.value
+        let timeoutToken: ReturnType<typeof setTimeout> | null = null
+
         const checkToken = setInterval(() => {
           if (token.value && token.value !== originalCallback) {
             clearInterval(checkToken)
+            if (timeoutToken) clearTimeout(timeoutToken)
             resolve(token.value)
           }
         }, 100)
 
         // Timeout after 30 seconds
-        setTimeout(() => {
-          clearInterval(checkToken)
+        timeoutToken = setTimeout(() => {
+          clearInterval(checkToken as any)
           reject(new Error('[vue3-recaptcha] Execute timeout'))
-        }, 30000)
+        }, 30000) as any
 
-        window.grecaptcha.execute(widgetId.value ?? undefined)
+        ;(window.grecaptcha as any).execute(widgetId.value ?? undefined)
       } catch (err) {
         reject(err instanceof Error ? err : new Error(String(err)))
       }
@@ -138,8 +135,8 @@ export function useRecaptchaV2(options: UseRecaptchaV2Options = {}): UseRecaptch
    * Reset the widget
    */
   function reset(): void {
-    if (widgetId.value !== null && window.grecaptcha) {
-      window.grecaptcha.reset(widgetId.value)
+    if (widgetId.value !== null && window.grecaptcha && 'reset' in window.grecaptcha) {
+      ;(window.grecaptcha as any).reset(widgetId.value)
       token.value = ''
     }
   }
@@ -148,8 +145,8 @@ export function useRecaptchaV2(options: UseRecaptchaV2Options = {}): UseRecaptch
    * Get current response token
    */
   function getResponse(): string {
-    if (widgetId.value !== null && window.grecaptcha) {
-      return window.grecaptcha.getResponse(widgetId.value)
+    if (widgetId.value !== null && window.grecaptcha && 'getResponse' in window.grecaptcha) {
+      return (window.grecaptcha as any).getResponse(widgetId.value)
     }
     return token.value
   }

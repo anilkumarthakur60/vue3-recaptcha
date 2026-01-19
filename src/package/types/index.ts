@@ -254,7 +254,9 @@ declare global {
 // Injection Keys
 // ============================================================================
 
-export const RECAPTCHA_INJECTION_KEY = Symbol('vue3-recaptcha') as import('vue').InjectionKey<RecaptchaContext>
+export const RECAPTCHA_INJECTION_KEY = Symbol(
+  'vue3-recaptcha'
+) as import('vue').InjectionKey<RecaptchaContext>
 
 export interface RecaptchaContext {
   siteKey: string
