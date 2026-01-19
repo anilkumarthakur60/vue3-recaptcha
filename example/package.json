@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@anilkumarthakur/vue3-recaptcha": "^0.0.9",
+    "axios": "^1.13.2",
     "vue": "^3.5.12",
     "vue3-google-signin": "^2.0.0"
   },
