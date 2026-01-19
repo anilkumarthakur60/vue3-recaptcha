@@ -5,11 +5,11 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "vue-tsc --noEmit && vite build",
     "preview": "vite preview"
   },
   "dependencies": {
-    "@anilkumarthakur/vue3-recaptcha": "file:..",
+    "@anilkumarthakur/vue3-recaptcha": "^0.0.9",
     "vue": "^3.5.12",
     "vue3-google-signin": "^2.0.0"
   },
