@@ -47,6 +47,12 @@ export interface RecaptchaPluginOptions {
   scriptUrl?: string
 
   /**
+   * Action name for reCAPTCHA v3 analytics
+   * @default 'submit'
+   */
+  action?: string
+
+  /**
    * Callback when script is loaded
    */
   onLoad?: () => void
