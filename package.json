@@ -8,12 +8,12 @@
   "author": "Anil Kumar Thakur",
   "repository": {
     "type": "git",
-    "url": "https://github.com/anilkumarthakur/vue3-recaptcha.git"
+    "url": "https://github.com/anilkumarthakur60/vue3-recaptcha.git"
   },
   "bugs": {
-    "url": "https://github.com/anilkumarthakur/vue3-recaptcha/issues"
+    "url": "https://github.com/anilkumarthakur60/vue3-recaptcha/issues"
   },
-  "homepage": "https://github.com/anilkumarthakur/vue3-recaptcha#readme",
+  "homepage": "https://github.com/anilkumarthakur60/vue3-recaptcha#readme",
   "keywords": [
     "recaptcha",
     "google-recaptcha",

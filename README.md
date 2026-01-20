@@ -2,7 +2,7 @@
 
 [![npm version](https://badge.fury.io/js/@anilkumarthakur%2Fvue3-recaptcha.svg)](https://www.npmjs.com/package/@anilkumarthakur/vue3-recaptcha)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![GitHub](https://img.shields.io/badge/GitHub-anilkumarthakur/vue3--recaptcha-blue)](https://github.com/anilkumarthakur/vue3-recaptcha)
+[![GitHub](https://img.shields.io/badge/GitHub-anilkumarthakur/vue3--recaptcha-blue)](https://github.com/anilkumarthakur60/vue3-recaptcha)
 
 A fully-typed Vue 3 plugin for seamless Google reCAPTCHA v2 and v3 integration. Supports reCAPTCHA v2 (checkbox & invisible) and v3 (score-based) with TypeScript first approach.
 
@@ -589,7 +589,7 @@ If you get CORS errors when verifying tokens on the backend, verify that:
 
 - [Google reCAPTCHA Docs](https://developers.google.com/recaptcha)
 - [Vue 3 Guide](https://vuejs.org/guide/introduction.html)
-- [GitHub Repository](https://github.com/anilkumarthakur/vue3-recaptcha)
+- [GitHub Repository](https://github.com/anilkumarthakur60/vue3-recaptcha)
 
 ## 🤝 Contributing
 
@@ -598,7 +598,7 @@ Contributions are welcome! Please feel free to:
 - Suggest features
 - Submit pull requests
 
-[Submit an Issue](https://github.com/anilkumarthakur/vue3-recaptcha/issues)
+[Submit an Issue](https://github.com/anilkumarthakur60/vue3-recaptcha/issues)
 
 ## 📄 License
 
@@ -610,4 +610,4 @@ Built with ❤️ for the Vue 3 community.
 
 ---
 
-**Questions?** Open a [GitHub Discussion](https://github.com/anilkumarthakur/vue3-recaptcha/discussions)
+**Questions?** Open a [GitHub Discussion](https://github.com/anilkumarthakur60/vue3-recaptcha/discussions)
