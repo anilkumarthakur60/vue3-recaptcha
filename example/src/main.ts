@@ -6,7 +6,8 @@ const app = createApp(App)
 
 app.use(recaptchaPlugin,{
     siteKey: '6LfQNKUaAAAAAHSVAVcs7kuzv2ZjLcR5nxssKrg5',
-    siteAction:'login',
+    version: 'v3',
+    action: 'login',
 })
 
 app.mount('#app')

@@ -6,26 +6,45 @@
     "module": "ESNext",
     "lib": ["ESNext", "DOM", "DOM.Iterable"],
     "skipLibCheck": true,
+
     /* Bundler mode */
-    "moduleResolution": "Node",
+    "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "preserve",
-    /* Linting */
+    "jsxImportSource": "vue",
+
+    /* Strict Type-Checking */
     "strict": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "strictFunctionTypes": true,
+    "strictBindCallApply": true,
+    "strictPropertyInitialization": true,
+    "noImplicitThis": true,
+    "useUnknownInCatchVariables": true,
+    "alwaysStrict": true,
+
+    /* Additional Checks */
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
-    /*Declaration */
+    "noUncheckedIndexedAccess": true,
+    "noImplicitReturns": true,
+    "noPropertyAccessFromIndexSignature": true,
+
+    /* Declaration */
     "declaration": true,
-    "typeRoots": ["./dist/index.d.ts", "node_modules/@types"],
-    "esModuleInterop": false,
+    "declarationMap": true,
+    "typeRoots": ["./node_modules/@types", "./src/types"],
+    "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "forceConsistentCasingInFileNames": true
   },
-  "include": ["src/package/**/*"],
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist", "example"],
   "references": [
     {
       "path": "./tsconfig.node.json"
