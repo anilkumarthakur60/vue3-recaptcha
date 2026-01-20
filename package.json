@@ -1,7 +1,7 @@
 {
   "name": "@anilkumarthakur/vue3-recaptcha",
   "description": "A Vue 3 plugin for Google reCAPTCHA v2 (checkbox & invisible) and v3 integration",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "private": false,
   "type": "module",
   "license": "MIT",
