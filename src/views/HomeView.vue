@@ -48,8 +48,13 @@ const copyToken = async (message: string = 'Token has been copied to clipboard')
 
 const handleRegenerate = async () => {
   loading.value = true
-  await recaptchaComponent.value?.loadRecaptcha()
-  loading.value = false
+  try {
+    await recaptchaComponent.value?.execute()
+  } catch (err) {
+    console.error('Failed to generate recaptcha token:', err)
+  } finally {
+    loading.value = false
+  }
 }
 
 const verifyResponse = ref<any>(null)
@@ -71,26 +76,24 @@ const verifyRecaptcha = async () => {
   }
 }
 
-onMounted(handleRegenerate)
+onMounted(() => {
+  // Wait for component to be loaded, then generate initial token
+  setTimeout(() => {
+    handleRegenerate()
+  }, 500)
+})
 </script>
 
 <template>
   <div class="recaptcha-container">
-    <RecaptchaV3
-      v-model="recaptchaToken"
-      @update:model-value="handleTokenUpdate"
-      ref="recaptchaComponent"
-    />
+    <RecaptchaV3 v-model="recaptchaToken" @update:model-value="handleTokenUpdate" ref="recaptchaComponent" />
     <div class="recaptcha-token-container">
       <div class="recaptcha-token-label">
         <span>Recaptcha Token:</span>
       </div>
       <div class="recaptcha-token-buttons">
-        <button
-          class="buttonload btn btn-primary"
-          @click="() => copyToken('Token has been copied to clipboard')"
-          :disabled="loading"
-        >
+        <button class="buttonload btn btn-primary" @click="() => copyToken('Token has been copied to clipboard')"
+          :disabled="loading">
           <i class="fa fa-copy" :class="{ 'fa-spin': loading }"></i>
           {{ loading ? 'Loading...' : 'Copy' }}
         </button>
