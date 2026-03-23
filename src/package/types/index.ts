@@ -3,6 +3,8 @@
  * Supports Google reCAPTCHA v2 (checkbox, invisible) and v3
  */
 
+import type { Ref, InjectionKey } from 'vue'
+
 // ============================================================================
 // Core Types
 // ============================================================================
@@ -199,11 +201,11 @@ export interface UseRecaptchaV3Options {
 }
 
 export interface UseRecaptchaV2Return {
-  token: Readonly<import('vue').Ref<string>>
-  isReady: Readonly<import('vue').Ref<boolean>>
-  isLoading: Readonly<import('vue').Ref<boolean>>
-  error: Readonly<import('vue').Ref<Error | null>>
-  widgetId: Readonly<import('vue').Ref<number | null>>
+  token: Readonly<Ref<string>>
+  isReady: Readonly<Ref<boolean>>
+  isLoading: Readonly<Ref<boolean>>
+  error: Readonly<Ref<Error | null>>
+  widgetId: Readonly<Ref<number | null>>
   render: (container: HTMLElement | string) => Promise<number>
   execute: () => Promise<string>
   reset: () => void
@@ -211,30 +213,29 @@ export interface UseRecaptchaV2Return {
 }
 
 export interface UseRecaptchaV3Return {
-  token: Readonly<import('vue').Ref<string>>
-  isReady: Readonly<import('vue').Ref<boolean>>
-  isLoading: Readonly<import('vue').Ref<boolean>>
-  error: Readonly<import('vue').Ref<Error | null>>
+  token: Readonly<Ref<string>>
+  isReady: Readonly<Ref<boolean>>
+  isLoading: Readonly<Ref<boolean>>
+  error: Readonly<Ref<Error | null>>
   execute: (action?: string) => Promise<string>
 }
 
 // ============================================================================
-// Global Window Types
+// Google reCAPTCHA Global Types
 // ============================================================================
 
+export interface GrecaptchaV2RenderParameters {
+  sitekey: string
+  theme?: RecaptchaTheme
+  size?: RecaptchaSize
+  tabindex?: number
+  callback?: (token: string) => void
+  'expired-callback'?: () => void
+  'error-callback'?: () => void
+}
+
 export interface GrecaptchaV2 {
-  render: (
-    container: HTMLElement | string,
-    parameters: {
-      sitekey: string
-      theme?: RecaptchaTheme
-      size?: RecaptchaSize
-      tabindex?: number
-      callback?: (token: string) => void
-      'expired-callback'?: () => void
-      'error-callback'?: (error: Error) => void
-    }
-  ) => number
+  render: (container: HTMLElement | string, parameters: GrecaptchaV2RenderParameters) => number
   execute: (widgetId?: number) => void
   reset: (widgetId?: number) => void
   getResponse: (widgetId?: number) => string
@@ -245,7 +246,18 @@ export interface GrecaptchaV3 {
   execute: (siteKey: string, options: { action: string }) => Promise<string>
 }
 
-export type Grecaptcha = GrecaptchaV2 & GrecaptchaV3
+/**
+ * Combined grecaptcha interface with properly overloaded execute method.
+ * Covers both v2 (widget-based) and v3 (score-based) API surfaces.
+ */
+export interface Grecaptcha {
+  render: (container: HTMLElement | string, parameters: GrecaptchaV2RenderParameters) => number
+  execute(widgetId?: number): void
+  execute(siteKey: string, options: { action: string }): Promise<string>
+  reset: (widgetId?: number) => void
+  getResponse: (widgetId?: number) => string
+  ready: (callback: () => void) => void
+}
 
 declare global {
   interface Window {
@@ -257,16 +269,41 @@ declare global {
 }
 
 // ============================================================================
+// Component Instance Types (for typing template refs)
+// ============================================================================
+
+export interface RecaptchaV2CheckboxInstance {
+  reset: () => void
+  getResponse: () => string
+  widgetId: Ref<number | null>
+}
+
+export interface RecaptchaV2InvisibleInstance {
+  execute: () => Promise<string>
+  reset: () => void
+  getResponse: () => string
+  widgetId: Ref<number | null>
+}
+
+export interface RecaptchaV3Instance {
+  load: () => Promise<void>
+  /** @deprecated Use `load` instead */
+  loadRecaptcha: () => Promise<void>
+  execute: (action?: string) => Promise<string>
+  isLoaded: Ref<boolean>
+  isLoading: Ref<boolean>
+  error: Ref<Error | null>
+}
+
+// ============================================================================
 // Injection Keys
 // ============================================================================
 
-export const RECAPTCHA_INJECTION_KEY = Symbol(
-  'vue3-recaptcha'
-) as import('vue').InjectionKey<RecaptchaContext>
+export const RECAPTCHA_INJECTION_KEY: InjectionKey<RecaptchaContext> = Symbol('vue3-recaptcha')
 
 export interface RecaptchaContext {
   siteKey: string
   version: RecaptchaVersion
-  isLoaded: import('vue').Ref<boolean>
+  isLoaded: Ref<boolean>
   loadScript: () => Promise<void>
 }

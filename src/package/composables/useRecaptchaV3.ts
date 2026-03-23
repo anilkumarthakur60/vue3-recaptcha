@@ -11,20 +11,20 @@ import { loadRecaptchaScript, isRecaptchaLoaded } from '../utils/script-loader'
 export function useRecaptchaV3(options: UseRecaptchaV3Options = {}): UseRecaptchaV3Return {
   const context = inject<RecaptchaContext | undefined>(RECAPTCHA_INJECTION_KEY, undefined)
 
-  const siteKeyValue = options.siteKey || context?.siteKey
-  if (!siteKeyValue) {
+  const resolvedSiteKey = options.siteKey ?? context?.siteKey
+  if (!resolvedSiteKey) {
     throw new Error(
       '[vue3-recaptcha] Site key is required. Provide it via plugin options or composable options.'
     )
   }
-  const siteKey: string = siteKeyValue
+  const siteKey: string = resolvedSiteKey
 
   const token = ref('')
   const isReady = ref(false)
   const isLoading = ref(false)
   const error = ref<Error | null>(null)
 
-  let tokenRefreshTimer: ReturnType<typeof setTimeout> | null = null
+  let tokenRefreshTimer: number | undefined
 
   /**
    * Load the reCAPTCHA script if not already loaded
@@ -58,12 +58,11 @@ export function useRecaptchaV3(options: UseRecaptchaV3Options = {}): UseRecaptch
   /**
    * Execute reCAPTCHA v3 and get a token
    * @param action - Action name for analytics (overrides default)
-   * @returns Promise resolving to the token
    */
   async function execute(action?: string): Promise<string> {
     await ensureLoaded()
 
-    const actionName = action || options.action || 'submit'
+    const actionName = action ?? options.action ?? 'submit'
 
     isLoading.value = true
     error.value = null
@@ -72,13 +71,14 @@ export function useRecaptchaV3(options: UseRecaptchaV3Options = {}): UseRecaptch
       const responseToken = await window.grecaptcha.execute(siteKey, { action: actionName })
       token.value = responseToken
 
-      // V3 tokens expire after 2 minutes, set up refresh warning
-      if (tokenRefreshTimer) {
-        clearTimeout(tokenRefreshTimer)
+      if (tokenRefreshTimer !== undefined) {
+        clearTimeout(tokenRefreshTimer as number)
       }
+
+      // V3 tokens expire after 2 minutes — clear slightly before expiry
       tokenRefreshTimer = setTimeout(() => {
         token.value = ''
-      }, 110000) // Clear token after ~110 seconds (tokens valid for 2 min)
+      }, 110000) as unknown as number
 
       return responseToken
     } catch (err) {
@@ -91,10 +91,9 @@ export function useRecaptchaV3(options: UseRecaptchaV3Options = {}): UseRecaptch
     }
   }
 
-  // Cleanup on unmount
   onUnmounted(() => {
-    if (tokenRefreshTimer) {
-      clearTimeout(tokenRefreshTimer)
+    if (tokenRefreshTimer !== undefined) {
+      clearTimeout(tokenRefreshTimer as number)
     }
     token.value = ''
   })

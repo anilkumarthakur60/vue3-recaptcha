@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { RecaptchaV3 } from '../package/components'
+import type { RecaptchaV3Instance } from '../package/types'
 import { onMounted, ref } from 'vue'
 import axios from 'axios'
 
-const recaptchaComponent = ref<InstanceType<typeof RecaptchaV3> | null>(null)
+const recaptchaComponent = ref<RecaptchaV3Instance | null>(null)
 const loading = ref<boolean>(false)
 const recaptchaToken = ref<string>('')
 
