@@ -7,4 +7,4 @@ updates:
       interval: 'weekly'
       day: 'monday' # Choose a specific day of the week (e.g., 'monday')
       time: '10:00'
-    open-pull-requests-limit: 10
+    open-pull-requests-limit: 20
