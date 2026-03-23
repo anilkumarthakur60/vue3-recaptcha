@@ -1,25 +1,44 @@
+/**
+ * Legacy test file — kept for reference.
+ * Comprehensive tests live in src/package/__tests__/RecaptchaV3.spec.ts
+ */
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import { shallowMount } from '@vue/test-utils'
-import RecaptchaV3 from '../package/components/RecaptchaV3.vue'
+import { RecaptchaV3 } from '../package/components/RecaptchaV3'
+import type { ScriptLoaderOptions } from '../package/utils/script-loader'
 
-describe('RecaptchaV3.vue', () => {
-  let grecaptchaMock: any
+vi.mock('../package/utils/script-loader', () => ({
+  loadRecaptchaScript: vi.fn().mockImplementation(async (options: ScriptLoaderOptions) => {
+    options.onLoad?.()
+  }),
+  isRecaptchaLoaded: vi.fn().mockReturnValue(true),
+  removeScript: vi.fn(),
+  getExistingScript: vi.fn().mockReturnValue(null),
+  buildScriptUrl: vi.fn().mockReturnValue('https://mock.recaptcha.net/api.js'),
+  waitForRecaptcha: vi.fn().mockResolvedValue(undefined)
+}))
 
+function makeGrecaptchaMock() {
+  return {
+    ready: vi.fn((cb: () => void) => cb()),
+    execute: vi.fn((_siteKey: string, _opts: { action: string }) =>
+      Promise.resolve('fake-token')
+    ),
+    render: vi.fn(() => 0),
+    reset: vi.fn(),
+    getResponse: vi.fn(() => 'fake-token')
+  }
+}
+
+describe('RecaptchaV3 (legacy)', () => {
   beforeEach(() => {
-    // Mock grecaptcha globally before each test
-    grecaptchaMock = {
-      ready: jest.fn((callback) => callback()),
-      execute: jest.fn(() => Promise.resolve('fake-token')),
-      render: jest.fn(() => 0),
-      reset: jest.fn(),
-      getResponse: jest.fn(() => 'fake-token')
-    }
-    global.window.grecaptcha = grecaptchaMock
+    window.grecaptcha = makeGrecaptchaMock() as unknown as typeof window.grecaptcha
   })
 
   afterEach(() => {
-    // Clear mock after each test
-    jest.clearAllMocks()
-    delete (global.window as any).grecaptcha
+    vi.clearAllMocks()
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    delete (window as any).grecaptcha
   })
 
   it('should use default props when none are provided', () => {
@@ -32,103 +51,60 @@ describe('RecaptchaV3.vue', () => {
 
   it('should emit update:modelValue event on execute', async () => {
     const wrapper = shallowMount(RecaptchaV3, {
-      props: {
-        siteKey: 'test-site-key',
-        action: 'homepage',
-        modelValue: ''
-      }
+      props: { siteKey: 'test-site-key', action: 'homepage', modelValue: '' }
     })
 
-    // Execute should trigger token generation
+    await new Promise((r) => setTimeout(r, 0))
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const token = await (wrapper.vm as any).execute()
 
-    expect(grecaptchaMock.execute).toHaveBeenCalledWith('test-site-key', { action: 'homepage' })
+    expect(window.grecaptcha.execute).toHaveBeenCalledWith('test-site-key', { action: 'homepage' })
     expect(token).toBe('fake-token')
   })
 
   it('should handle errors when recaptcha is not available', async () => {
-    // Remove grecaptcha from the global scope to simulate it not being loaded
-    delete (global.window as any).grecaptcha
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    delete (window as any).grecaptcha
 
     const wrapper = shallowMount(RecaptchaV3, {
-      props: {
-        siteKey: 'test-site-key',
-        action: 'homepage'
-      }
+      props: { siteKey: 'test-site-key', action: 'homepage' }
     })
 
-    // Try executing when grecaptcha is not loaded
+    await new Promise((r) => setTimeout(r, 0))
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     await expect((wrapper.vm as any).execute()).rejects.toThrow('grecaptcha is not available')
   })
 
   it('should update isLoaded ref on successful load', async () => {
     const wrapper = shallowMount(RecaptchaV3, {
-      props: {
-        siteKey: 'test-site-key'
-      }
+      props: { siteKey: 'test-site-key' }
     })
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const vm = wrapper.vm as any
-    expect(vm.isLoaded).toBe(false)
-
     await vm.load()
 
-    expect(vm.isLoaded).toBe(true)
-  })
-
-  it('should emit error event on load failure', async () => {
-    const error = new Error('Test error')
-    grecaptchaMock.ready = jest.fn(() => {
-      throw error
-    })
-
-    const wrapper = shallowMount(RecaptchaV3, {
-      props: {
-        siteKey: 'test-site-key'
-      }
-    })
-
-    // Load should handle the error gracefully
-    const vm = wrapper.vm as any
-    expect(vm.error).toBe(null)
+    expect(vm.isLoaded.value).toBe(true)
   })
 
   it('should have execute method', () => {
     const wrapper = shallowMount(RecaptchaV3)
-    const vm = wrapper.vm as any
-
-    expect(typeof vm.execute).toBe('function')
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    expect(typeof (wrapper.vm as any).execute).toBe('function')
   })
 
   it('should have load method', () => {
     const wrapper = shallowMount(RecaptchaV3)
-    const vm = wrapper.vm as any
-
-    expect(typeof vm.load).toBe('function')
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    expect(typeof (wrapper.vm as any).load).toBe('function')
   })
 
   it('should have loadRecaptcha alias for backward compatibility', () => {
     const wrapper = shallowMount(RecaptchaV3)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const vm = wrapper.vm as any
 
     expect(typeof vm.loadRecaptcha).toBe('function')
     expect(vm.loadRecaptcha).toBe(vm.load)
   })
-
-  it('should clear error on successful execution', async () => {
-    const wrapper = shallowMount(RecaptchaV3, {
-      props: {
-        siteKey: 'test-site-key'
-      }
-    })
-
-    const vm = wrapper.vm as any
-    vm.error = new Error('Previous error')
-
-    await vm.execute()
-
-    // Error should be cleared after successful execution
-    expect(vm.error).toBe(null)
-  })
 })
-

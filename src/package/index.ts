@@ -6,15 +6,15 @@
  */
 
 import type { App, Plugin } from 'vue'
+import { ref } from 'vue'
 import type { RecaptchaPluginOptions, RecaptchaContext, RecaptchaVersion } from './types'
 import { RECAPTCHA_INJECTION_KEY } from './types'
 import { loadRecaptchaScript } from './utils/script-loader'
-import { ref } from 'vue'
 
 // Components
-import RecaptchaV2Checkbox from './components/RecaptchaV2Checkbox.vue'
-import RecaptchaV2Invisible from './components/RecaptchaV2Invisible.vue'
-import RecaptchaV3 from './components/RecaptchaV3.vue'
+import { RecaptchaV2Checkbox } from './components/RecaptchaV2Checkbox'
+import { RecaptchaV2Invisible } from './components/RecaptchaV2Invisible'
+import { RecaptchaV3 } from './components/RecaptchaV3'
 
 // Composables
 import { useRecaptchaV2 } from './composables/useRecaptchaV2'
@@ -26,7 +26,7 @@ import { useRecaptchaV3 } from './composables/useRecaptchaV3'
  * @example
  * ```ts
  * import { createApp } from 'vue'
- * import { VueRecaptchaPlugin } from 'vue3-recaptcha'
+ * import { VueRecaptchaPlugin } from '@anilkumarthakur/vue3-recaptcha'
  *
  * const app = createApp(App)
  * app.use(VueRecaptchaPlugin, {
@@ -42,17 +42,15 @@ export const VueRecaptchaPlugin: Plugin = {
       return
     }
 
-    const version: RecaptchaVersion = options.version || 'v3'
+    const version: RecaptchaVersion = options.version ?? 'v3'
     const isLoaded = ref(false)
 
-    // Register components globally
     app.component('RecaptchaV2Checkbox', RecaptchaV2Checkbox)
     app.component('RecaptchaV2Invisible', RecaptchaV2Invisible)
-    app.component('RecaptchaV2', RecaptchaV2Checkbox) // Alias
+    app.component('RecaptchaV2', RecaptchaV2Checkbox)
     app.component('RecaptchaV3', RecaptchaV3)
-    app.component('Recaptcha', RecaptchaV3) // Alias
+    app.component('Recaptcha', RecaptchaV3)
 
-    // Load script function
     const loadScript = async (): Promise<void> => {
       await loadRecaptchaScript({
         siteKey: options.siteKey,
@@ -62,13 +60,13 @@ export const VueRecaptchaPlugin: Plugin = {
         onLoad: () => {
           isLoaded.value = true
           options.onLoad?.()
-        },
-        onError: options.onError
+        }
+        // onError is intentionally omitted — errors propagate as rejections
+        // and are handled once in the .catch below
       })
       isLoaded.value = true
     }
 
-    // Create context
     const context: RecaptchaContext = {
       siteKey: options.siteKey,
       version,
@@ -76,12 +74,11 @@ export const VueRecaptchaPlugin: Plugin = {
       loadScript
     }
 
-    // Provide context
     app.provide(RECAPTCHA_INJECTION_KEY, context)
 
-    // Auto-load if enabled (default: true)
     if (options.autoLoad !== false) {
-      loadScript().catch((error) => {
+      loadScript().catch((err: unknown) => {
+        const error = err instanceof Error ? err : new Error(String(err))
         console.error('[vue3-recaptcha] Failed to auto-load script:', error)
         options.onError?.(error)
       })
@@ -98,7 +95,6 @@ export const recaptchaPlugin = VueRecaptchaPlugin
 
 export { RecaptchaV2Checkbox, RecaptchaV2Invisible, RecaptchaV3 }
 
-// Component Aliases
 export { RecaptchaV2Checkbox as RecaptchaV2 }
 export { RecaptchaV3 as Recaptcha }
 
@@ -113,38 +109,36 @@ export { useRecaptchaV2, useRecaptchaV3 }
 // ============================================================================
 
 export type {
-  // Plugin
   RecaptchaPluginOptions,
   RecaptchaContext,
   RecaptchaVersion,
 
-  // V2 Checkbox
   RecaptchaV2CheckboxProps,
   RecaptchaV2CheckboxEmits,
 
-  // V2 Invisible
   RecaptchaV2InvisibleProps,
   RecaptchaV2InvisibleEmits,
 
-  // V3
   RecaptchaV3Props,
   RecaptchaV3Emits,
 
-  // Composables
   UseRecaptchaV2Options,
   UseRecaptchaV2Return,
   UseRecaptchaV3Options,
   UseRecaptchaV3Return,
 
-  // Common Types
   RecaptchaTheme,
   RecaptchaSize,
   RecaptchaBadgePosition,
 
-  // Global Types
   Grecaptcha,
   GrecaptchaV2,
-  GrecaptchaV3
+  GrecaptchaV3,
+  GrecaptchaV2RenderParameters,
+
+  RecaptchaV2CheckboxInstance,
+  RecaptchaV2InvisibleInstance,
+  RecaptchaV3Instance
 } from './types'
 
 export { RECAPTCHA_INJECTION_KEY } from './types'
