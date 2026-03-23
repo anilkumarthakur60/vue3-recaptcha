@@ -3,7 +3,9 @@ import { mount } from '@vue/test-utils'
 import { RecaptchaV2Checkbox } from '../components/RecaptchaV2Checkbox'
 
 vi.mock('../utils/script-loader', () => ({
-  loadRecaptchaScript: vi.fn().mockResolvedValue(undefined),
+  loadRecaptchaScript: vi.fn().mockImplementation(async (opts: any) => {
+    opts.onLoad?.()
+  }),
   isRecaptchaLoaded: vi.fn().mockReturnValue(true),
   removeScript: vi.fn(),
   getExistingScript: vi.fn().mockReturnValue(null),
@@ -190,7 +192,7 @@ describe('RecaptchaV2Checkbox', () => {
 
       await waitForRender()
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      expect((wrapper.vm as any).widgetId.value).toBe(42)
+      expect((wrapper.vm as any).widgetId).toBe(42)
     })
   })
 
@@ -199,10 +201,10 @@ describe('RecaptchaV2Checkbox', () => {
 
     await waitForRender()
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    expect((wrapper.vm as any).widgetId.value).toBe(42)
+    expect((wrapper.vm as any).widgetId).toBe(42)
 
     wrapper.unmount()
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    expect((wrapper.vm as any).widgetId.value).toBeNull()
+    expect((wrapper.vm as any).widgetId).toBeNull()
   })
 })

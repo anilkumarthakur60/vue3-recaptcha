@@ -5,7 +5,9 @@ import { useRecaptchaV3 } from '../composables/useRecaptchaV3'
 import type { UseRecaptchaV3Options } from '../types'
 
 vi.mock('../utils/script-loader', () => ({
-  loadRecaptchaScript: vi.fn().mockResolvedValue(undefined),
+  loadRecaptchaScript: vi.fn().mockImplementation(async (opts: any) => {
+    opts.onLoad?.()
+  }),
   isRecaptchaLoaded: vi.fn().mockReturnValue(true),
   removeScript: vi.fn(),
   getExistingScript: vi.fn().mockReturnValue(null),
@@ -50,6 +52,7 @@ describe('useRecaptchaV3', () => {
   })
 
   afterEach(() => {
+    vi.useRealTimers()
     vi.clearAllMocks()
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     delete (window as any).grecaptcha
@@ -136,7 +139,7 @@ describe('useRecaptchaV3', () => {
 
       window.grecaptcha.execute = vi.fn((_siteKey: string, _opts: { action: string }) =>
         Promise.resolve('ok-token')
-      ) as typeof window.grecaptcha.execute
+      ) as unknown as typeof window.grecaptcha.execute
 
       await result.execute()
       expect(result.error.value).toBeNull()

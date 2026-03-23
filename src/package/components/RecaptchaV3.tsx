@@ -115,13 +115,13 @@ export const RecaptchaV3 = defineComponent({
         emit('verify', token)
 
         if (tokenExpiryTimer !== undefined) {
-          window.clearTimeout(tokenExpiryTimer)
+          clearTimeout(tokenExpiryTimer as number)
         }
 
         // V3 tokens expire after 2 minutes — clear slightly before
-        tokenExpiryTimer = window.setTimeout(() => {
+        tokenExpiryTimer = setTimeout(() => {
           emit('update:modelValue', '')
-        }, 110000)
+        }, 110000) as unknown as number
 
         return token
       } catch (err) {
@@ -143,7 +143,7 @@ export const RecaptchaV3 = defineComponent({
 
     onBeforeUnmount(() => {
       if (tokenExpiryTimer !== undefined) {
-        window.clearTimeout(tokenExpiryTimer)
+        clearTimeout(tokenExpiryTimer as number)
       }
     })
 

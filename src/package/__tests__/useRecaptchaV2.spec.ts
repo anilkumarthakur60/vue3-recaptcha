@@ -6,7 +6,9 @@ import type { UseRecaptchaV2Options } from '../types'
 
 // Mock the script loader so tests don't try to inject real <script> tags
 vi.mock('../utils/script-loader', () => ({
-  loadRecaptchaScript: vi.fn().mockResolvedValue(undefined),
+  loadRecaptchaScript: vi.fn().mockImplementation(async (opts: any) => {
+    opts.onLoad?.()
+  }),
   isRecaptchaLoaded: vi.fn().mockReturnValue(true),
   removeScript: vi.fn(),
   getExistingScript: vi.fn().mockReturnValue(null),
@@ -67,6 +69,7 @@ describe('useRecaptchaV2', () => {
   })
 
   afterEach(() => {
+    vi.useRealTimers()
     vi.clearAllMocks()
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     delete (window as any).grecaptcha
@@ -159,7 +162,7 @@ describe('useRecaptchaV2', () => {
       window.grecaptcha.execute = vi.fn((_widgetId?: number) => {
         window.setTimeout(() => capturedRenderParams.callback?.('execute-token'), 50)
         return undefined
-      })
+      }) as unknown as typeof window.grecaptcha.execute
 
       const promise = result.execute()
       vi.advanceTimersByTime(500)
@@ -175,10 +178,11 @@ describe('useRecaptchaV2', () => {
 
       vi.useFakeTimers()
       const promise = result.execute()
-      vi.advanceTimersByTime(30001)
+      const rejection = expect(promise).rejects.toThrow('Execute timeout')
+      await vi.runAllTimersAsync()
       vi.useRealTimers()
 
-      await expect(promise).rejects.toThrow('Execute timeout')
+      await rejection
     })
   })
 

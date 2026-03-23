@@ -106,27 +106,27 @@ export function useRecaptchaV2(options: UseRecaptchaV2Options = {}): UseRecaptch
 
     return new Promise<string>((resolve, reject) => {
       const previousToken = token.value
-      let intervalId: number | undefined
-      let timeoutId: number | undefined
+      let intervalId: ReturnType<typeof setInterval> | undefined
+      let timeoutId: ReturnType<typeof setTimeout> | undefined
 
-      intervalId = window.setInterval(() => {
+      intervalId = setInterval(() => {
         if (token.value && token.value !== previousToken) {
-          window.clearInterval(intervalId)
-          window.clearTimeout(timeoutId)
+          clearInterval(intervalId as unknown as number)
+          clearTimeout(timeoutId as unknown as number)
           resolve(token.value)
         }
       }, 100)
 
-      timeoutId = window.setTimeout(() => {
-        window.clearInterval(intervalId)
+      timeoutId = setTimeout(() => {
+        clearInterval(intervalId as unknown as number)
         reject(new Error('[vue3-recaptcha] Execute timeout after 30 seconds'))
       }, 30000)
 
       try {
         window.grecaptcha.execute(currentWidgetId)
       } catch (err) {
-        window.clearInterval(intervalId)
-        window.clearTimeout(timeoutId)
+        clearInterval(intervalId as unknown as number)
+        clearTimeout(timeoutId as unknown as number)
         reject(err instanceof Error ? err : new Error(String(err)))
       }
     })

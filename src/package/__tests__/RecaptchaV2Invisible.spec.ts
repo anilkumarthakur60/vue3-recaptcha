@@ -3,7 +3,9 @@ import { mount } from '@vue/test-utils'
 import { RecaptchaV2Invisible } from '../components/RecaptchaV2Invisible'
 
 vi.mock('../utils/script-loader', () => ({
-  loadRecaptchaScript: vi.fn().mockResolvedValue(undefined),
+  loadRecaptchaScript: vi.fn().mockImplementation(async (opts: any) => {
+    opts.onLoad?.()
+  }),
   isRecaptchaLoaded: vi.fn().mockReturnValue(true),
   removeScript: vi.fn(),
   getExistingScript: vi.fn().mockReturnValue(null),
@@ -48,6 +50,7 @@ describe('RecaptchaV2Invisible', () => {
   })
 
   afterEach(() => {
+    vi.useRealTimers()
     vi.clearAllMocks()
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     delete (window as any).grecaptcha
@@ -135,7 +138,7 @@ describe('RecaptchaV2Invisible', () => {
       window.grecaptcha.execute = vi.fn((_widgetId?: number) => {
         setTimeout(() => capturedRenderParams.callback?.('exec-token'), 10)
         return undefined
-      })
+      }) as unknown as typeof window.grecaptcha.execute
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const promise = (wrapper.vm as any).execute() as Promise<string>
@@ -153,11 +156,13 @@ describe('RecaptchaV2Invisible', () => {
       window.grecaptcha.execute = vi.fn((_widgetId?: number) => {
         setTimeout(() => capturedRenderParams['error-callback']?.(), 10)
         return undefined
-      })
+      }) as unknown as typeof window.grecaptcha.execute
 
       // Attach rejection handler immediately to avoid unhandled-rejection warning
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const rejection = expect((wrapper.vm as any).execute() as Promise<string>).rejects.toBeInstanceOf(Error)
+      const rejection = expect(
+        (wrapper.vm as any).execute() as Promise<string>
+      ).rejects.toBeInstanceOf(Error)
       await new Promise((r) => setTimeout(r, 50))
       await rejection
     })
@@ -173,9 +178,10 @@ describe('RecaptchaV2Invisible', () => {
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const promise = (wrapper.vm as any).execute() as Promise<string>
-      vi.advanceTimersByTime(60001)
+      const rejection = expect(promise).rejects.toThrow('Verification timeout')
+      await vi.runAllTimersAsync()
 
-      await expect(promise).rejects.toThrow('Verification timeout')
+      await rejection
       vi.useRealTimers()
     })
   })
@@ -191,7 +197,7 @@ describe('RecaptchaV2Invisible', () => {
       expect(typeof vm.execute).toBe('function')
       expect(typeof vm.reset).toBe('function')
       expect(typeof vm.getResponse).toBe('function')
-      expect(vm.widgetId.value).toBe(7)
+      expect(vm.widgetId).toBe(7)
     })
 
     it('reset calls grecaptcha.reset and emits empty modelValue', async () => {
@@ -225,6 +231,6 @@ describe('RecaptchaV2Invisible', () => {
     wrapper.unmount()
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    expect((wrapper.vm as any).widgetId.value).toBeNull()
+    expect((wrapper.vm as any).widgetId).toBeFalsy()
   })
 })

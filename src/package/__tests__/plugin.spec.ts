@@ -1,7 +1,8 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import { createApp } from 'vue'
 import { VueRecaptchaPlugin, RECAPTCHA_INJECTION_KEY } from '../index'
-import type { RecaptchaContext, ScriptLoaderOptions } from '../types'
+import type { RecaptchaContext } from '../types'
+import type { ScriptLoaderOptions } from '../utils/script-loader'
 
 // The mock calls onLoad so the plugin's isLoaded/onLoad callbacks fire properly
 vi.mock('../utils/script-loader', () => ({
@@ -48,7 +49,13 @@ describe('VueRecaptchaPlugin', () => {
     const app = createTestApp()
     app.use(VueRecaptchaPlugin, { siteKey: 'test-key', autoLoad: false })
 
-    const names = ['RecaptchaV2Checkbox', 'RecaptchaV2Invisible', 'RecaptchaV2', 'RecaptchaV3', 'Recaptcha']
+    const names = [
+      'RecaptchaV2Checkbox',
+      'RecaptchaV2Invisible',
+      'RecaptchaV2',
+      'RecaptchaV3',
+      'Recaptcha'
+    ]
     for (const name of names) {
       expect(app.component(name)).toBeDefined()
     }

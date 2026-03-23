@@ -192,11 +192,7 @@ export const RecaptchaV2Invisible = defineComponent({
     expose({ execute, reset, getResponse, widgetId })
 
     return () => (
-      <div
-        ref={containerRef}
-        class="vue3-recaptcha-v2-invisible"
-        style={{ display: 'none' }}
-      />
+      <div ref={containerRef} class="vue3-recaptcha-v2-invisible" style={{ display: 'none' }} />
     )
   }
 })

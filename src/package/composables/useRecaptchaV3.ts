@@ -72,13 +72,13 @@ export function useRecaptchaV3(options: UseRecaptchaV3Options = {}): UseRecaptch
       token.value = responseToken
 
       if (tokenRefreshTimer !== undefined) {
-        window.clearTimeout(tokenRefreshTimer)
+        clearTimeout(tokenRefreshTimer as number)
       }
 
       // V3 tokens expire after 2 minutes — clear slightly before expiry
-      tokenRefreshTimer = window.setTimeout(() => {
+      tokenRefreshTimer = setTimeout(() => {
         token.value = ''
-      }, 110000)
+      }, 110000) as unknown as number
 
       return responseToken
     } catch (err) {
@@ -93,7 +93,7 @@ export function useRecaptchaV3(options: UseRecaptchaV3Options = {}): UseRecaptch
 
   onUnmounted(() => {
     if (tokenRefreshTimer !== undefined) {
-      window.clearTimeout(tokenRefreshTimer)
+      clearTimeout(tokenRefreshTimer as number)
     }
     token.value = ''
   })

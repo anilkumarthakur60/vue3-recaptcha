@@ -3,7 +3,9 @@ import { mount } from '@vue/test-utils'
 import { RecaptchaV3 } from '../components/RecaptchaV3'
 
 vi.mock('../utils/script-loader', () => ({
-  loadRecaptchaScript: vi.fn().mockResolvedValue(undefined),
+  loadRecaptchaScript: vi.fn().mockImplementation(async (opts: any) => {
+    opts.onLoad?.()
+  }),
   isRecaptchaLoaded: vi.fn().mockReturnValue(true),
   removeScript: vi.fn(),
   getExistingScript: vi.fn().mockReturnValue(null),
@@ -33,6 +35,7 @@ describe('RecaptchaV3', () => {
   })
 
   afterEach(() => {
+    vi.useRealTimers()
     vi.clearAllMocks()
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     delete (window as any).grecaptcha
@@ -79,7 +82,7 @@ describe('RecaptchaV3', () => {
       const vm = wrapper.vm as any
       await vm.load()
 
-      expect(vm.isLoaded.value).toBe(true)
+      expect(vm.isLoaded).toBe(true)
     })
 
     it('is idempotent — does not reload when already loaded', async () => {
@@ -90,7 +93,8 @@ describe('RecaptchaV3', () => {
       const vm = wrapper.vm as any
 
       await vm.load()
-      const firstCallCount = (window.grecaptcha.execute as ReturnType<typeof vi.fn>).mock.calls.length
+      const firstCallCount = (window.grecaptcha.execute as ReturnType<typeof vi.fn>).mock.calls
+        .length
 
       await vm.load() // second call should be no-op
       expect((window.grecaptcha.execute as ReturnType<typeof vi.fn>).mock.calls.length).toBe(
@@ -157,7 +161,7 @@ describe('RecaptchaV3', () => {
       await expect((wrapper.vm as any).execute()).rejects.toThrow('api error')
 
       const errorEvents = wrapper.emitted('error') as Error[][]
-      expect(errorEvents[0]?.[0].message).toBe('api error')
+      expect(errorEvents[0]?.[0]?.message).toBe('api error')
     })
 
     it('throws when grecaptcha is not available', async () => {
@@ -185,7 +189,7 @@ describe('RecaptchaV3', () => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       await (wrapper.vm as any).execute()
 
-      vi.advanceTimersByTime(110001)
+      await vi.advanceTimersByTimeAsync(110001)
 
       const updates = wrapper.emitted('update:modelValue') as string[][]
       expect(updates.at(-1)).toEqual([''])
@@ -260,9 +264,9 @@ describe('RecaptchaV3', () => {
       expect(typeof vm.loadRecaptcha).toBe('function')
       expect(vm.loadRecaptcha).toBe(vm.load)
       expect(typeof vm.execute).toBe('function')
-      expect(typeof vm.isLoaded.value).toBe('boolean')
-      expect(typeof vm.isLoading.value).toBe('boolean')
-      expect(vm.error.value).toBeNull()
+      expect(typeof vm.isLoaded).toBe('boolean')
+      expect(typeof vm.isLoading).toBe('boolean')
+      expect(vm.error).toBeNull()
     })
   })
 
