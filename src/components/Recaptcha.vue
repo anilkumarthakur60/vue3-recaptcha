@@ -10,7 +10,7 @@ const props = withDefaults(
     action?: string
   }>(),
   {
-    siteKey: '6LfQNKUaAAAAAHSVAVcs7kuzv2ZjLcR5nxssKrg5',
+    siteKey: '',
     action: 'homepage'
   }
 )
