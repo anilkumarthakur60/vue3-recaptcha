@@ -1,13 +1,10 @@
 /// <reference types="vite/client" />
 
-declare module '*.vue' {
-  import type { DefineComponent } from 'vue'
-  const component: DefineComponent<{}, {}, any>
-  export default component
-}
+
 
 interface ImportMetaEnv {
-  readonly VITE_RECAPTCHA_SITE_KEY: string
+  readonly VITE_RECAPTCHA_SITE_KEY_V3: string
+  readonly VITE_RECAPTCHA_SITE_KEY_V2: string
 }
 
 interface ImportMeta {

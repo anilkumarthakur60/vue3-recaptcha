@@ -67,8 +67,8 @@ import { VueRecaptchaPlugin } from '@anilkumarthakur/vue3-recaptcha'
 const app = createApp(App)
 
 app.use(VueRecaptchaPlugin, {
-  siteKey: import.meta.env.VITE_RECAPTCHA_SITE_KEY,
-  version: 'v3', // 'v2' | 'v3'
+  siteKey: import.meta.env.VITE_RECAPTCHA_SITE_KEY_V3,
+  version: 'v3' // 'v2' | 'v3'
 })
 
 app.mount('#app')
@@ -105,16 +105,16 @@ async function submit() {
 
 ## Plugin Options
 
-| Option | Type | Default | Description |
-|--------|------|---------|-------------|
-| `siteKey` | `string` | — | **Required.** Your Google reCAPTCHA site key |
-| `version` | `'v2' \| 'v3'` | `'v3'` | Which reCAPTCHA version to load |
-| `autoLoad` | `boolean` | `true` | Load the Google script immediately on install |
-| `language` | `string` | — | Force a language (e.g. `'fr'`, `'de'`) |
-| `scriptUrl` | `string` | — | Override the Google script URL entirely |
-| `action` | `string` | `'submit'` | Default action name for v3 analytics |
-| `onLoad` | `() => void` | — | Callback when script loads successfully |
-| `onError` | `(e: Error) => void` | — | Callback when script fails to load |
+| Option      | Type                 | Default    | Description                                   |
+| ----------- | -------------------- | ---------- | --------------------------------------------- |
+| `siteKey`   | `string`             | —          | **Required.** Your Google reCAPTCHA site key  |
+| `version`   | `'v2' \| 'v3'`       | `'v3'`     | Which reCAPTCHA version to load               |
+| `autoLoad`  | `boolean`            | `true`     | Load the Google script immediately on install |
+| `language`  | `string`             | —          | Force a language (e.g. `'fr'`, `'de'`)        |
+| `scriptUrl` | `string`             | —          | Override the Google script URL entirely       |
+| `action`    | `string`             | `'submit'` | Default action name for v3 analytics          |
+| `onLoad`    | `() => void`         | —          | Callback when script loads successfully       |
+| `onError`   | `(e: Error) => void` | —          | Callback when script fails to load            |
 
 ---
 
@@ -144,29 +144,33 @@ import type { RecaptchaV3Instance } from '@anilkumarthakur/vue3-recaptcha'
 const token = ref('')
 const recaptcha = ref<RecaptchaV3Instance>()
 
-function onVerify(t: string) { /* verified */ }
-function onError(e: Error) { /* handle error */ }
+function onVerify(t: string) {
+  /* verified */
+}
+function onError(e: Error) {
+  /* handle error */
+}
 </script>
 ```
 
 **Props**
 
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `siteKey` | `string` | plugin config | Override the site key per-instance |
-| `action` | `string` | `'submit'` | Action label for Google Analytics |
-| `badge` | `'bottomright' \| 'bottomleft' \| 'inline'` | `'bottomright'` | Badge position |
-| `hideBadge` | `boolean` | `false` | Hide the reCAPTCHA badge |
-| `modelValue` | `string` | — | v-model token binding |
+| Prop         | Type                                        | Default         | Description                        |
+| ------------ | ------------------------------------------- | --------------- | ---------------------------------- |
+| `siteKey`    | `string`                                    | plugin config   | Override the site key per-instance |
+| `action`     | `string`                                    | `'submit'`      | Action label for Google Analytics  |
+| `badge`      | `'bottomright' \| 'bottomleft' \| 'inline'` | `'bottomright'` | Badge position                     |
+| `hideBadge`  | `boolean`                                   | `false`         | Hide the reCAPTCHA badge           |
+| `modelValue` | `string`                                    | —               | v-model token binding              |
 
 **Emits:** `update:modelValue`, `verify(token)`, `error(Error)`, `load`
 
 **Ref Methods**
 
-| Method | Returns | Description |
-|--------|---------|-------------|
-| `execute(action?)` | `Promise<string>` | Generate a new token |
-| `load()` | `Promise<void>` | Manually trigger script load |
+| Method             | Returns           | Description                  |
+| ------------------ | ----------------- | ---------------------------- |
+| `execute(action?)` | `Promise<string>` | Generate a new token         |
+| `load()`           | `Promise<void>`   | Manually trigger script load |
 
 **Ref State:** `isLoaded`, `isLoading`, `error`
 
@@ -196,20 +200,24 @@ import type { RecaptchaV2CheckboxInstance } from '@anilkumarthakur/vue3-recaptch
 const token = ref('')
 const checkbox = ref<RecaptchaV2CheckboxInstance>()
 
-function onVerify(t: string) { /* user checked */ }
-function onExpire() { token.value = '' }
+function onVerify(t: string) {
+  /* user checked */
+}
+function onExpire() {
+  token.value = ''
+}
 </script>
 ```
 
 **Props**
 
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `siteKey` | `string` | plugin config | Override the site key per-instance |
-| `theme` | `'light' \| 'dark'` | `'light'` | Widget color theme |
-| `size` | `'normal' \| 'compact'` | `'normal'` | Widget size |
-| `tabindex` | `number` | `0` | Accessibility tabindex |
-| `modelValue` | `string` | — | v-model token binding |
+| Prop         | Type                    | Default       | Description                        |
+| ------------ | ----------------------- | ------------- | ---------------------------------- |
+| `siteKey`    | `string`                | plugin config | Override the site key per-instance |
+| `theme`      | `'light' \| 'dark'`     | `'light'`     | Widget color theme                 |
+| `size`       | `'normal' \| 'compact'` | `'normal'`    | Widget size                        |
+| `tabindex`   | `number`                | `0`           | Accessibility tabindex             |
+| `modelValue` | `string`                | —             | v-model token binding              |
 
 **Emits:** `update:modelValue`, `verify(token)`, `expire`, `error(Error)`, `load`
 
@@ -225,12 +233,7 @@ Invisible v2 — no UI, fires on demand, returns a token via promise.
 
 ```vue
 <template>
-  <RecaptchaV2Invisible
-    v-model="token"
-    badge="bottomright"
-    @verify="onVerify"
-    ref="invisible"
-  />
+  <RecaptchaV2Invisible v-model="token" badge="bottomright" @verify="onVerify" ref="invisible" />
   <button @click="verify">Submit</button>
 </template>
 
@@ -246,18 +249,20 @@ async function verify() {
   // proceed with form submission
 }
 
-function onVerify(t: string) { /* token ready */ }
+function onVerify(t: string) {
+  /* token ready */
+}
 </script>
 ```
 
 **Props**
 
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `siteKey` | `string` | plugin config | Override the site key per-instance |
-| `badge` | `'bottomright' \| 'bottomleft' \| 'inline'` | `'bottomright'` | Badge position |
-| `tabindex` | `number` | `0` | Accessibility tabindex |
-| `modelValue` | `string` | — | v-model token binding |
+| Prop         | Type                                        | Default         | Description                        |
+| ------------ | ------------------------------------------- | --------------- | ---------------------------------- |
+| `siteKey`    | `string`                                    | plugin config   | Override the site key per-instance |
+| `badge`      | `'bottomright' \| 'bottomleft' \| 'inline'` | `'bottomright'` | Badge position                     |
+| `tabindex`   | `number`                                    | `0`             | Accessibility tabindex             |
+| `modelValue` | `string`                                    | —               | v-model token binding              |
 
 **Emits:** `update:modelValue`, `verify(token)`, `expire`, `error(Error)`, `load`
 
@@ -275,12 +280,12 @@ Composables give you full programmatic control without mounting a component. Use
 import { useRecaptchaV3 } from '@anilkumarthakur/vue3-recaptcha'
 
 const { execute, token, isReady, isLoading, error } = useRecaptchaV3({
-  action: 'checkout',
+  action: 'checkout'
 })
 
 async function handleSubmit() {
   try {
-    const t = await execute()          // generates a fresh token
+    const t = await execute() // generates a fresh token
     await api.post('/checkout', { recaptchaToken: t })
   } catch (e) {
     console.error('reCAPTCHA failed', e)
@@ -288,18 +293,18 @@ async function handleSubmit() {
 }
 ```
 
-| Option | Type | Description |
-|--------|------|-------------|
-| `siteKey` | `string` | Override plugin-level site key |
-| `action` | `string` | Default action for `execute()` calls |
+| Option    | Type     | Description                          |
+| --------- | -------- | ------------------------------------ |
+| `siteKey` | `string` | Override plugin-level site key       |
+| `action`  | `string` | Default action for `execute()` calls |
 
-| Return | Type | Description |
-|--------|------|-------------|
-| `token` | `Readonly<Ref<string>>` | Current token (clears after 110s) |
-| `isReady` | `Readonly<Ref<boolean>>` | Script has loaded |
-| `isLoading` | `Readonly<Ref<boolean>>` | Token generation in progress |
-| `error` | `Readonly<Ref<Error \| null>>` | Last error |
-| `execute(action?)` | `Promise<string>` | Generate a token |
+| Return             | Type                           | Description                       |
+| ------------------ | ------------------------------ | --------------------------------- |
+| `token`            | `Readonly<Ref<string>>`        | Current token (clears after 110s) |
+| `isReady`          | `Readonly<Ref<boolean>>`       | Script has loaded                 |
+| `isLoading`        | `Readonly<Ref<boolean>>`       | Token generation in progress      |
+| `error`            | `Readonly<Ref<Error \| null>>` | Last error                        |
+| `execute(action?)` | `Promise<string>`              | Generate a token                  |
 
 ---
 
@@ -313,7 +318,7 @@ const container = ref<HTMLElement>()
 
 const { render, execute, reset, token, error } = useRecaptchaV2({
   theme: 'dark',
-  size: 'normal',
+  size: 'normal'
 })
 
 onMounted(async () => {
@@ -326,17 +331,17 @@ async function handleSubmit() {
 }
 ```
 
-| Return | Type | Description |
-|--------|------|-------------|
-| `token` | `Readonly<Ref<string>>` | Current token |
-| `widgetId` | `Readonly<Ref<number \| null>>` | Google widget ID |
-| `isReady` | `Readonly<Ref<boolean>>` | Widget rendered |
-| `isLoading` | `Readonly<Ref<boolean>>` | Execution in progress |
-| `error` | `Readonly<Ref<Error \| null>>` | Last error |
-| `render(el)` | `Promise<number>` | Mount widget into a DOM element |
-| `execute()` | `Promise<string>` | Trigger invisible verification |
-| `reset()` | `void` | Reset widget state |
-| `getResponse()` | `string` | Get current token synchronously |
+| Return          | Type                            | Description                     |
+| --------------- | ------------------------------- | ------------------------------- |
+| `token`         | `Readonly<Ref<string>>`         | Current token                   |
+| `widgetId`      | `Readonly<Ref<number \| null>>` | Google widget ID                |
+| `isReady`       | `Readonly<Ref<boolean>>`        | Widget rendered                 |
+| `isLoading`     | `Readonly<Ref<boolean>>`        | Execution in progress           |
+| `error`         | `Readonly<Ref<Error \| null>>`  | Last error                      |
+| `render(el)`    | `Promise<number>`               | Mount widget into a DOM element |
+| `execute()`     | `Promise<string>`               | Trigger invisible verification  |
+| `reset()`       | `void`                          | Reset widget state              |
+| `getResponse()` | `string`                        | Get current token synchronously |
 
 ---
 
@@ -348,7 +353,7 @@ All component instance types are exported for use with template refs:
 import type {
   RecaptchaV3Instance,
   RecaptchaV2CheckboxInstance,
-  RecaptchaV2InvisibleInstance,
+  RecaptchaV2InvisibleInstance
 } from '@anilkumarthakur/vue3-recaptcha'
 ```
 
@@ -356,11 +361,11 @@ Other exported types:
 
 ```ts
 import type {
-  RecaptchaVersion,       // 'v2' | 'v3'
-  RecaptchaTheme,         // 'light' | 'dark'
-  RecaptchaSize,          // 'normal' | 'compact' | 'invisible'
+  RecaptchaVersion, // 'v2' | 'v3'
+  RecaptchaTheme, // 'light' | 'dark'
+  RecaptchaSize, // 'normal' | 'compact' | 'invisible'
   RecaptchaBadgePosition, // 'bottomright' | 'bottomleft' | 'inline'
-  VueRecaptchaPluginOptions,
+  VueRecaptchaPluginOptions
 } from '@anilkumarthakur/vue3-recaptcha'
 ```
 
@@ -378,7 +383,7 @@ npm install
 
 # 3. Set up your reCAPTCHA key
 # Create a .env file in the project root:
-echo "VITE_RECAPTCHA_SITE_KEY=your_key_here" > .env
+echo "VITE_RECAPTCHA_SITE_KEY_V3=your_key_here" > .env
 
 # 4. Start the demo app
 npm run dev
@@ -399,12 +404,12 @@ npm run build
 
 Outputs to `dist/` in multiple formats:
 
-| File | Format | Use case |
-|------|--------|----------|
-| `dist/index.es.js` | ES Module | Vite / modern bundlers |
-| `dist/index.cjs` | CommonJS | Node / older bundlers |
-| `dist/index.iife.js` | IIFE | CDN / `<script>` tags |
-| `dist/index.d.ts` | TypeScript | Type declarations |
+| File                 | Format     | Use case               |
+| -------------------- | ---------- | ---------------------- |
+| `dist/index.es.js`   | ES Module  | Vite / modern bundlers |
+| `dist/index.cjs`     | CommonJS   | Node / older bundlers  |
+| `dist/index.iife.js` | IIFE       | CDN / `<script>` tags  |
+| `dist/index.d.ts`    | TypeScript | Type declarations      |
 
 ### Build the demo app
 
