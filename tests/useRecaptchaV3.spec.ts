@@ -1,10 +1,10 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import { mount } from '@vue/test-utils'
 import { defineComponent, h } from 'vue'
-import { useRecaptchaV3 } from '../composables/useRecaptchaV3'
-import type { UseRecaptchaV3Options } from '../types'
+import { useRecaptchaV3 } from '../src/package/composables/useRecaptchaV3'
+import type { UseRecaptchaV3Options } from '../src/package/types'
 
-vi.mock('../utils/script-loader', () => ({
+vi.mock('../src/package/utils/script-loader', () => ({
   loadRecaptchaScript: vi.fn().mockImplementation(async (opts: any) => {
     opts.onLoad?.()
   }),
@@ -54,7 +54,7 @@ describe('useRecaptchaV3', () => {
   afterEach(() => {
     vi.useRealTimers()
     vi.clearAllMocks()
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
     delete (window as any).grecaptcha
   })
 

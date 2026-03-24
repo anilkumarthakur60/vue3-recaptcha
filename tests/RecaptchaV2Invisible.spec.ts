@@ -1,8 +1,8 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import { mount } from '@vue/test-utils'
-import { RecaptchaV2Invisible } from '../components/RecaptchaV2Invisible'
+import { RecaptchaV2Invisible } from '../src/package/components/RecaptchaV2Invisible'
 
-vi.mock('../utils/script-loader', () => ({
+vi.mock('../src/package/utils/script-loader', () => ({
   loadRecaptchaScript: vi.fn().mockImplementation(async (opts: any) => {
     opts.onLoad?.()
   }),
@@ -52,7 +52,7 @@ describe('RecaptchaV2Invisible', () => {
   afterEach(() => {
     vi.useRealTimers()
     vi.clearAllMocks()
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
     delete (window as any).grecaptcha
   })
 
@@ -140,7 +140,7 @@ describe('RecaptchaV2Invisible', () => {
         return undefined
       }) as unknown as typeof window.grecaptcha.execute
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
       const promise = (wrapper.vm as any).execute() as Promise<string>
       await new Promise((r) => setTimeout(r, 50))
       const token = await promise
@@ -159,7 +159,7 @@ describe('RecaptchaV2Invisible', () => {
       }) as unknown as typeof window.grecaptcha.execute
 
       // Attach rejection handler immediately to avoid unhandled-rejection warning
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
       const rejection = expect(
         (wrapper.vm as any).execute() as Promise<string>
       ).rejects.toBeInstanceOf(Error)
@@ -176,7 +176,7 @@ describe('RecaptchaV2Invisible', () => {
       await waitForRender()
       vi.useFakeTimers()
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
       const promise = (wrapper.vm as any).execute() as Promise<string>
       const rejection = expect(promise).rejects.toThrow('Verification timeout')
       await vi.runAllTimersAsync()
@@ -191,7 +191,7 @@ describe('RecaptchaV2Invisible', () => {
       const wrapper = mount(RecaptchaV2Invisible, { props: { siteKey: 'my-key' } })
 
       await waitForRender()
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
       const vm = wrapper.vm as any
 
       expect(typeof vm.execute).toBe('function')
@@ -204,8 +204,8 @@ describe('RecaptchaV2Invisible', () => {
       const wrapper = mount(RecaptchaV2Invisible, { props: { siteKey: 'my-key' } })
 
       await waitForRender()
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      ;(wrapper.vm as any).reset()
+
+        ; (wrapper.vm as any).reset()
 
       expect(window.grecaptcha.reset).toHaveBeenCalledWith(7)
       const updates = wrapper.emitted('update:modelValue') as string[][]
@@ -216,7 +216,7 @@ describe('RecaptchaV2Invisible', () => {
       const wrapper = mount(RecaptchaV2Invisible, { props: { siteKey: 'my-key' } })
 
       await waitForRender()
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
       const response = (wrapper.vm as any).getResponse()
 
       expect(window.grecaptcha.getResponse).toHaveBeenCalledWith(7)
@@ -230,7 +230,7 @@ describe('RecaptchaV2Invisible', () => {
     await waitForRender()
     wrapper.unmount()
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
     expect((wrapper.vm as any).widgetId).toBeFalsy()
   })
 })

@@ -131,24 +131,22 @@ export const RecaptchaV2Invisible = defineComponent({
       }
 
       return new Promise<string>((resolve, reject) => {
-        let timeoutHandle: number | undefined
-
-        pendingResolve.value = (token: string) => {
-          if (timeoutHandle !== undefined) window.clearTimeout(timeoutHandle)
-          resolve(token)
-        }
-
-        pendingReject.value = (err: Error) => {
-          if (timeoutHandle !== undefined) window.clearTimeout(timeoutHandle)
-          reject(err)
-        }
-
-        timeoutHandle = window.setTimeout(() => {
+        const timeoutHandle = window.setTimeout(() => {
           const rejectFn = pendingReject.value
           pendingResolve.value = null
           pendingReject.value = null
           rejectFn?.(new Error('[vue3-recaptcha] Verification timeout after 60 seconds'))
         }, 60000)
+
+        pendingResolve.value = (token: string) => {
+          window.clearTimeout(timeoutHandle)
+          resolve(token)
+        }
+
+        pendingReject.value = (err: Error) => {
+          window.clearTimeout(timeoutHandle)
+          reject(err)
+        }
 
         try {
           window.grecaptcha.execute(currentWidgetId)

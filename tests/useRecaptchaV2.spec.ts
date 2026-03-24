@@ -1,11 +1,11 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import { mount } from '@vue/test-utils'
 import { defineComponent, h } from 'vue'
-import { useRecaptchaV2 } from '../composables/useRecaptchaV2'
-import type { UseRecaptchaV2Options } from '../types'
+import { useRecaptchaV2 } from '../src/package/composables/useRecaptchaV2'
+import type { UseRecaptchaV2Options } from '../src/package/types'
 
 // Mock the script loader so tests don't try to inject real <script> tags
-vi.mock('../utils/script-loader', () => ({
+vi.mock('../src/package/utils/script-loader', () => ({
   loadRecaptchaScript: vi.fn().mockImplementation(async (opts: any) => {
     opts.onLoad?.()
   }),
@@ -71,7 +71,7 @@ describe('useRecaptchaV2', () => {
   afterEach(() => {
     vi.useRealTimers()
     vi.clearAllMocks()
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
     delete (window as any).grecaptcha
   })
 

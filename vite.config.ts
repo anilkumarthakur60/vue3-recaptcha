@@ -2,80 +2,56 @@ import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import vueJsx from '@vitejs/plugin-vue-jsx'
 import dts from 'vite-plugin-dts'
-import { resolve } from 'path'
+import path from 'path'
 
-/**
- * Vite configuration for building vue3-recaptcha as an npm package
- * Supports both ES modules and UMD builds
- */
 export default defineConfig({
   plugins: [
     vue(),
     vueJsx(),
     dts({
-      include: ['src/package'],
-      rollupTypes: true,
-      strictOutput: true,
-    })
+      insertTypesEntry: true,
+      outDir: 'dist',
+      include: ['src/package/**/*'],
+      exclude: ['tests/**/*.spec.ts', 'tests/**/*.test.ts'],
+    }),
   ],
 
   build: {
     lib: {
-      entry: resolve(__dirname, 'src/package/index.ts'),
+      entry: path.resolve(__dirname, 'src/package/index.ts'),
       name: 'Vue3Recaptcha',
+      formats: ['es', 'cjs', 'umd', 'iife'],
       fileName: (format) => {
-        const formatMap: Record<string, string> = {
+        const names: Record<string, string> = {
           es: 'index.es.js',
+          cjs: 'index.cjs',
           umd: 'index.umd.js',
-          cjs: 'index.cjs'
+          iife: 'index.iife.js',
         }
-        return formatMap[format] || `index.${format}.js`
+        return names[format] ?? `index.${format}.js`
       },
-      formats: ['es', 'umd', 'cjs']
     },
 
     rollupOptions: {
-      // Externalize Vue to avoid duplication in consuming apps
       external: ['vue'],
-      output: [
-        {
-          format: 'es',
-          entryFileNames: 'index.es.js',
-          dir: 'dist',
-          exports: 'named'
-        },
-        {
-          format: 'umd',
-          entryFileNames: 'index.umd.js',
-          name: 'Vue3Recaptcha',
-          globals: {
-            vue: 'Vue'
-          },
-          dir: 'dist',
-          exports: 'named'
-        },
-        {
-          format: 'cjs',
-          entryFileNames: 'index.cjs',
-          dir: 'dist',
-          exports: 'named'
-        }
-      ]
+      treeshake: { moduleSideEffects: false },
+      output: {
+        exports: 'named',
+        globals: { vue: 'Vue' }, // used by umd + iife
+      },
     },
 
-    // Build optimizations
-    minify: 'esbuild', // Use esbuild instead of terser (lighter weight)
-    sourcemap: false, // Disable for production npm package (reduces size by ~150 KB)
+    target: 'ES2022',
+    minify: 'esbuild',
+    sourcemap: true,
     emptyOutDir: true,
     cssCodeSplit: false,
-    target: 'ES2020',
-    outDir: 'dist',
-    copyPublicDir: false, // Prevent favicon.ico from being copied to dist
+    copyPublicDir: false,
   },
 
   resolve: {
     alias: {
-      '@': resolve(__dirname, './src')
-    }
-  }
+      '@': path.resolve(__dirname, 'src'),
+    },
+  },
 })
