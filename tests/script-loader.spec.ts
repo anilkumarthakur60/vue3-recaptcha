@@ -6,8 +6,8 @@ import {
   loadRecaptchaScript,
   removeScript,
   waitForRecaptcha
-} from '../utils/script-loader'
-import type { ScriptLoaderOptions } from '../utils/script-loader'
+} from '../src/package/utils/script-loader'
+import type { ScriptLoaderOptions } from '../src/package/utils/script-loader'
 
 // ─── helpers ────────────────────────────────────────────────────────────────
 
@@ -101,7 +101,7 @@ describe('isRecaptchaLoaded', () => {
   afterEach(() => {
     removeScript()
     vi.restoreAllMocks()
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
     delete (window as any).grecaptcha
   })
 
@@ -153,7 +153,7 @@ describe('getExistingScript', () => {
 describe('loadRecaptchaScript', () => {
   beforeEach(() => {
     removeScript()
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
     delete (window as any).grecaptcha
   })
 
@@ -242,7 +242,7 @@ describe('loadRecaptchaScript', () => {
 describe('waitForRecaptcha', () => {
   beforeEach(() => {
     removeScript()
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
     delete (window as any).grecaptcha
     vi.useFakeTimers()
   })

@@ -30,6 +30,8 @@
   "main": "./dist/index.cjs",
   "module": "./dist/index.es.js",
   "types": "./dist/index.d.ts",
+  "unpkg": "./dist/index.iife.js",
+  "jsdelivr": "./dist/index.iife.js",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -93,9 +95,9 @@
     "build:prod": "vue-tsc && vite build --config vite.config.prod.ts",
     "preview": "vite preview",
     "type-check": "vue-tsc --noEmit",
-    "lint": "eslint src/package --ext .vue,.js,.jsx,.ts,.tsx --fix",
+    "lint": "eslint src/package --fix",
     "format": "prettier --write \"src/package/**/*.{vue,ts,tsx,js,jsx,json,css}\"",
-    "test": "vitest run src/package",
+    "test": "vitest run tests",
     "prepublishOnly": "npm run build",
     "version": "npm run format && git add -A"
   }

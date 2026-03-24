@@ -1,11 +1,11 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import { createApp } from 'vue'
-import { VueRecaptchaPlugin, RECAPTCHA_INJECTION_KEY } from '../index'
-import type { RecaptchaContext } from '../types'
-import type { ScriptLoaderOptions } from '../utils/script-loader'
+import { VueRecaptchaPlugin, RECAPTCHA_INJECTION_KEY } from '../src/package/index'
+import type { RecaptchaContext } from '../src/package/types'
+import type { ScriptLoaderOptions } from '../src/package/utils/script-loader'
 
 // The mock calls onLoad so the plugin's isLoaded/onLoad callbacks fire properly
-vi.mock('../utils/script-loader', () => ({
+vi.mock('../src/package/utils/script-loader', () => ({
   loadRecaptchaScript: vi.fn().mockImplementation(async (options: ScriptLoaderOptions) => {
     options.onLoad?.()
   }),
@@ -16,7 +16,7 @@ vi.mock('../utils/script-loader', () => ({
   waitForRecaptcha: vi.fn().mockResolvedValue(undefined)
 }))
 
-import { loadRecaptchaScript } from '../utils/script-loader'
+import { loadRecaptchaScript } from '../src/package/utils/script-loader'
 
 // ─── helpers ────────────────────────────────────────────────────────────────
 
@@ -39,7 +39,7 @@ describe('VueRecaptchaPlugin', () => {
     const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => undefined)
 
     const app = createTestApp()
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
     app.use(VueRecaptchaPlugin, {} as any)
 
     expect(errorSpy).toHaveBeenCalledWith(expect.stringContaining('Site key is required'))

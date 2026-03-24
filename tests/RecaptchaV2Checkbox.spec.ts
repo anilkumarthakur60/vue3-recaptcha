@@ -1,8 +1,8 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import { mount } from '@vue/test-utils'
-import { RecaptchaV2Checkbox } from '../components/RecaptchaV2Checkbox'
+import { RecaptchaV2Checkbox } from '../src/package/components/RecaptchaV2Checkbox'
 
-vi.mock('../utils/script-loader', () => ({
+vi.mock('../src/package/utils/script-loader', () => ({
   loadRecaptchaScript: vi.fn().mockImplementation(async (opts: any) => {
     opts.onLoad?.()
   }),
@@ -53,7 +53,7 @@ describe('RecaptchaV2Checkbox', () => {
 
   afterEach(() => {
     vi.clearAllMocks()
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
     delete (window as any).grecaptcha
   })
 
@@ -164,8 +164,8 @@ describe('RecaptchaV2Checkbox', () => {
       const wrapper = mount(RecaptchaV2Checkbox, { props: { siteKey: 'my-key' } })
 
       await waitForRender()
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      ;(wrapper.vm as any).reset()
+
+        ; (wrapper.vm as any).reset()
 
       expect(window.grecaptcha.reset).toHaveBeenCalledWith(42)
     })
@@ -174,7 +174,7 @@ describe('RecaptchaV2Checkbox', () => {
       const wrapper = mount(RecaptchaV2Checkbox, { props: { siteKey: 'my-key' } })
 
       await waitForRender()
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
       const response = (wrapper.vm as any).getResponse()
 
       expect(window.grecaptcha.getResponse).toHaveBeenCalledWith(42)
@@ -183,7 +183,7 @@ describe('RecaptchaV2Checkbox', () => {
 
     it('getResponse returns empty string before render', () => {
       const wrapper = mount(RecaptchaV2Checkbox)
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
       expect((wrapper.vm as any).getResponse()).toBe('')
     })
 
@@ -191,7 +191,7 @@ describe('RecaptchaV2Checkbox', () => {
       const wrapper = mount(RecaptchaV2Checkbox, { props: { siteKey: 'my-key' } })
 
       await waitForRender()
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
       expect((wrapper.vm as any).widgetId).toBe(42)
     })
   })
@@ -200,11 +200,11 @@ describe('RecaptchaV2Checkbox', () => {
     const wrapper = mount(RecaptchaV2Checkbox, { props: { siteKey: 'my-key' } })
 
     await waitForRender()
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
     expect((wrapper.vm as any).widgetId).toBe(42)
 
     wrapper.unmount()
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
     expect((wrapper.vm as any).widgetId).toBeNull()
   })
 })

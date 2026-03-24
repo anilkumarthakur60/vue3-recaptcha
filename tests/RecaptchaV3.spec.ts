@@ -4,10 +4,10 @@
  */
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import { shallowMount } from '@vue/test-utils'
-import { RecaptchaV3 } from '../package/components/RecaptchaV3'
-import type { ScriptLoaderOptions } from '../package/utils/script-loader'
+import { RecaptchaV3 } from '../src/package/components/RecaptchaV3'
+import type { ScriptLoaderOptions } from '../src/package/utils/script-loader'
 
-vi.mock('../package/utils/script-loader', () => ({
+vi.mock('../src/package/utils/script-loader', () => ({
   loadRecaptchaScript: vi.fn().mockImplementation(async (options: ScriptLoaderOptions) => {
     options.onLoad?.()
   }),
@@ -37,7 +37,7 @@ describe('RecaptchaV3 (legacy)', () => {
 
   afterEach(() => {
     vi.clearAllMocks()
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
     delete (window as any).grecaptcha
   })
 
@@ -55,7 +55,7 @@ describe('RecaptchaV3 (legacy)', () => {
     })
 
     await new Promise((r) => setTimeout(r, 0))
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
     const token = await (wrapper.vm as any).execute()
 
     expect(window.grecaptcha.execute).toHaveBeenCalledWith('test-site-key', { action: 'homepage' })
@@ -63,7 +63,7 @@ describe('RecaptchaV3 (legacy)', () => {
   })
 
   it('should handle errors when recaptcha is not available', async () => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
     delete (window as any).grecaptcha
 
     const wrapper = shallowMount(RecaptchaV3, {
@@ -71,7 +71,7 @@ describe('RecaptchaV3 (legacy)', () => {
     })
 
     await new Promise((r) => setTimeout(r, 0))
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
     await expect((wrapper.vm as any).execute()).rejects.toThrow('grecaptcha is not available')
   })
 
@@ -80,28 +80,28 @@ describe('RecaptchaV3 (legacy)', () => {
       props: { siteKey: 'test-site-key' }
     })
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
     const vm = wrapper.vm as any
     await vm.load()
 
-    expect(vm.isLoaded.value).toBe(true)
+    expect(vm.isLoaded).toBe(true)
   })
 
   it('should have execute method', () => {
     const wrapper = shallowMount(RecaptchaV3)
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
     expect(typeof (wrapper.vm as any).execute).toBe('function')
   })
 
   it('should have load method', () => {
     const wrapper = shallowMount(RecaptchaV3)
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
     expect(typeof (wrapper.vm as any).load).toBe('function')
   })
 
   it('should have loadRecaptcha alias for backward compatibility', () => {
     const wrapper = shallowMount(RecaptchaV3)
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
     const vm = wrapper.vm as any
 
     expect(typeof vm.loadRecaptcha).toBe('function')

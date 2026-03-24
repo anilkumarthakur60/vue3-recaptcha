@@ -10,7 +10,7 @@ const app = createApp(App)
 app.use(createPinia())
 app.use(router)
 app.use(recaptchaPlugin, {
-  siteKey: '6Ld22VYrAAAAACjAgqRWwYzzJhZNmL4FzWYpak1b',
+  siteKey: import.meta.env.VITE_RECAPTCHA_SITE_KEY_V3,
   action: 'login'
 })
 

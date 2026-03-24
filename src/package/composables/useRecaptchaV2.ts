@@ -106,10 +106,8 @@ export function useRecaptchaV2(options: UseRecaptchaV2Options = {}): UseRecaptch
 
     return new Promise<string>((resolve, reject) => {
       const previousToken = token.value
-      let intervalId: ReturnType<typeof setInterval> | undefined
-      let timeoutId: ReturnType<typeof setTimeout> | undefined
 
-      intervalId = setInterval(() => {
+      const intervalId = setInterval(() => {
         if (token.value && token.value !== previousToken) {
           clearInterval(intervalId as unknown as number)
           clearTimeout(timeoutId as unknown as number)
@@ -117,7 +115,7 @@ export function useRecaptchaV2(options: UseRecaptchaV2Options = {}): UseRecaptch
         }
       }, 100)
 
-      timeoutId = setTimeout(() => {
+      const timeoutId = setTimeout(() => {
         clearInterval(intervalId as unknown as number)
         reject(new Error('[vue3-recaptcha] Execute timeout after 30 seconds'))
       }, 30000)
