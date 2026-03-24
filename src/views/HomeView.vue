@@ -63,7 +63,7 @@ const verifyRecaptcha = async () => {
   loading.value = true
   try {
     const response = await axios.post(
-      'https://express-recaptcha-verify.vercel.app/verify-captcha',
+      import.meta.env.VITE_API_VERIFY_CAPTCHA_V3,
       {
         captcha_token: recaptchaToken.value
       }
