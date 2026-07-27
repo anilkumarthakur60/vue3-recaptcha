@@ -76,7 +76,7 @@
     "esbuild": "^0.28.0",
     "eslint": "^10.1.0",
     "eslint-plugin-vue": "^10.8.0",
-    "jsdom": "^29.0.1",
+    "jsdom": "^30.0.0",
     "pinia": "^4.0.2",
     "prettier": "^3.8.1",
     "sass-embedded": "^1.98.0",
